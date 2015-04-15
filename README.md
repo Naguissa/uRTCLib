@@ -1,5 +1,4 @@
-# RTCLib
-RTCLib
+# Arduino RTCLib
 
 ## What is this repository for? ##
 
@@ -25,9 +24,6 @@ AT24C32 EEPROM supported
 
 
 ```
-#!Arduino
-
-
 #include <Wire.h>
 #include <RTCLib.h>
 
@@ -44,7 +40,7 @@ void setup() {
   }
 // Only used once, then disabled
 //  rtc.set(0, 8, 17, 1, 5, 4, 15);
-  // RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
+//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
 
   pos = 0;
 }
