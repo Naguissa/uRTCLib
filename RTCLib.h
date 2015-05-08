@@ -13,61 +13,71 @@
  * @created 2015-05-07
  */
 #ifndef RTCLIB
-#define RTCLIB
-#include "Arduino.h"
-#include "Wire.h"
-/*
-RTC I2C Address:
-DS3231 ROM 0x57
-DS3231 RTC 0x68
-*/
-#define RTCLIB_ADDRESS 0x68
-#define RTCLIB_EE_ADDRESS 0x57
+	#define RTCLIB
+	#include "Arduino.h"
+	#ifdef _VARIANT_ARDUINO_STM32_
+		#include "HardWire.h"
+		#define RTCLIB_SMT32_HWIREID 1
+	#else
+		#include "Wire.h"
+	#endif
+	/*
+	RTC I2C Address:
+	DS3231 ROM 0x57
+	DS3231 RTC 0x68
+	*/
+	#define RTCLIB_ADDRESS 0x68
+	#define RTCLIB_EE_ADDRESS 0x57
 
-//Comment to disable RTC-setting function
-#define RTCLIB_SET
+	//Comment to disable RTC-setting function
+	#define RTCLIB_SET
 
-//Comment to disable EEPROM functionality
-#define RTCLIB_EEPROM
+	//Comment to disable EEPROM functionality
+	#define RTCLIB_EEPROM
 
-// Convert normal decimal numbers to binary coded decimal
-#define RTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
-//#define RTCLIB_decToBcd(val) ((uint8_t) (val + 6 * (val / 10)))
+	// Convert normal decimal numbers to binary coded decimal
+	#define RTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
+	//#define RTCLIB_decToBcd(val) ((uint8_t) (val + 6 * (val / 10)))
 
-// Convert binary coded decimal to normal decimal numbers
-//#define RTCLIB_bcdToDec(val) ((uint8_t) (val - 6 * (val >> 4)))
-#define RTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
+	// Convert binary coded decimal to normal decimal numbers
+	//#define RTCLIB_bcdToDec(val) ((uint8_t) (val - 6 * (val >> 4)))
+	#define RTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
 
-class RTCLib {
-  public:
-    RTCLib();
-    uint8_t second();
-    uint8_t minute();
-    uint8_t hour();
-    uint8_t day();
-    uint8_t month();
-    uint8_t year();
-    uint8_t seconds();
-    uint8_t dayOfWeek();
+	class RTCLib {
+		public:
+			RTCLib();
+			uint8_t second();
+			uint8_t minute();
+			uint8_t hour();
+			uint8_t day();
+			uint8_t month();
+			uint8_t year();
+			uint8_t seconds();
+			uint8_t dayOfWeek();
+			void refresh();
 
-    void refresh();
+			#ifdef RTCLIB_SET
+				void set(uint8_t second, uint8_t minute, uint8_t hour, uint8_t dayOfWeek, uint8_t dayOfMonth, uint8_t month, uint8_t year);
+			#endif
 
-#ifdef RTCLIB_SET
-	void set(uint8_t second, uint8_t minute, uint8_t hour, uint8_t dayOfWeek, uint8_t dayOfMonth, uint8_t month, uint8_t year);
-#endif
+			#ifdef RTCLIB_EEPROM
+				unsigned char eeprom_read(const unsigned int address);
+				void eeprom_write(const unsigned int address, const unsigned char data);
+			#endif;
 
-#ifdef RTCLIB_EEPROM
-    unsigned char eeprom_read(const unsigned int address);
-    void eeprom_write(const unsigned int address, const unsigned char data);
-#endif;
-
-  private:
-    uint8_t _second = 0;
-    uint8_t _minute = 0;
-    uint8_t _hour = 0;
-    uint8_t _day = 0;
-    uint8_t _month = 0;
-    uint8_t _year = 0;
-    uint8_t _dayOfWeek = 0;
-};
+		private:
+			#ifdef _VARIANT_ARDUINO_STM32_
+				HardWire * RTCLIB_WIRE = NULL;
+				void _init();
+			#else
+				TwoWire *RTCLIB_WIRE = &Wire;
+			#endif
+			uint8_t _second = 0;
+			uint8_t _minute = 0;
+			uint8_t _hour = 0;
+			uint8_t _day = 0;
+			uint8_t _month = 0;
+			uint8_t _year = 0;
+			uint8_t _dayOfWeek = 0;
+	};
 #endif
