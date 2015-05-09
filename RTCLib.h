@@ -15,12 +15,7 @@
 #ifndef RTCLIB
 	#define RTCLIB
 	#include "Arduino.h"
-	#ifdef _VARIANT_ARDUINO_STM32_
-		#include "HardWire.h"
-		#define RTCLIB_SMT32_HWIREID 1
-	#else
-		#include "Wire.h"
-	#endif
+	#include "Wire.h"
 	/*
 	RTC I2C Address:
 	DS3231 ROM 0x57
@@ -42,6 +37,12 @@
 	// Convert binary coded decimal to normal decimal numbers
 	//#define RTCLIB_bcdToDec(val) ((uint8_t) (val - 6 * (val >> 4)))
 	#define RTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
+
+
+	#ifdef _VARIANT_ARDUINO_STM32_
+		#define RTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
+	#endif
+
 
 	class RTCLib {
 		public:
@@ -66,12 +67,6 @@
 			#endif;
 
 		private:
-			#ifdef _VARIANT_ARDUINO_STM32_
-				HardWire * RTCLIB_WIRE = NULL;
-				void _init();
-			#else
-				TwoWire *RTCLIB_WIRE = &Wire;
-			#endif
 			uint8_t _second = 0;
 			uint8_t _minute = 0;
 			uint8_t _hour = 0;
@@ -79,5 +74,8 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
+			#ifdef _VARIANT_ARDUINO_STM32_
+				bool _do_init = true;
+			#endif
 	};
 #endif
