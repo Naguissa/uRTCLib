@@ -29,5 +29,5 @@ Included on example folder, available on Arduino IDE.
 
 ## Who do I talk to? ##
 
- * - [Naguissa](https://github.com/Naguissa)
+ * [Naguissa](https://github.com/Naguissa)
  * http://www.naguissa.com
