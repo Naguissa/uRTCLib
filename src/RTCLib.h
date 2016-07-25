@@ -64,7 +64,7 @@
 			#ifdef RTCLIB_EEPROM
 				unsigned char eeprom_read(const unsigned int address);
 				void eeprom_write(const unsigned int address, const unsigned char data);
-			#endif;
+			#endif
 
 		private:
 			uint8_t _second = 0;
