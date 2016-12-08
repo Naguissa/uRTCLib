@@ -1,4 +1,4 @@
-# Arduino and STM32 RTCLib
+# Arduino and STM32 uRTCLib
 
 ## What is this repository for? ##
 
@@ -15,10 +15,10 @@ AT24C32 EEPROM supported
 ## How do I get set up? ##
 
  * Get the ZIP.
- * Rename to RTCLib.zip
+ * Rename to uRTCLib.zip
  * Install library on Arduino
 
- * Optionally you can edit RTCLib.h to change I2C addresses or disable RTC setting functionality or EEPROM functionality,
+ * Optionally you can edit uRTCLib.h to change I2C addresses or disable RTC setting functionality or EEPROM functionality,
 
 
 ## Example ##
