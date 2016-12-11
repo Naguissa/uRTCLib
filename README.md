@@ -1,8 +1,8 @@
-# Arduino and STM32 uRTCLib
+# Arduino, ESP8266 and STM32 uRTCLib
 
 ## What is this repository for? ##
 
-Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino and STM32 microcontrollers.
+Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino, ESP8266 and STM32 microcontrollers.
 
 DS1307 and DS3231 RTCs are supported
 
