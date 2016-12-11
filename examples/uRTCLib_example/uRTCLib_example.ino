@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "Wire.h"
-#include "RTCLib.h"
+#include "uRTCLib.h"
 
 
 RTCLib rtc;
