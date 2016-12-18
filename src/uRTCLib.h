@@ -12,8 +12,8 @@
  * @version 1.0
  * @created 2015-05-07
  */
-#ifndef RTCLIB
-	#define RTCLIB
+#ifndef uRTCLIB
+	#define uRTCLIB
 	#include "Arduino.h"
 	#include "Wire.h"
 	/*
@@ -21,32 +21,32 @@
 	DS3231 ROM 0x57
 	DS3231 RTC 0x68
 	*/
-	#define RTCLIB_ADDRESS 0x68
-	#define RTCLIB_EE_ADDRESS 0x57
+	#define uRTCLIB_ADDRESS 0x68
+	#define uRTCLIB_EE_ADDRESS 0x57
 
 	//Comment to disable RTC-setting function
-	#define RTCLIB_SET
+	#define uRTCLIB_SET
 
 	//Comment to disable EEPROM functionality
-	#define RTCLIB_EEPROM
+	#define uRTCLIB_EEPROM
 
 	// Convert normal decimal numbers to binary coded decimal
-	#define RTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
+	#define uRTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
 	//#define RTCLIB_decToBcd(val) ((uint8_t) (val + 6 * (val / 10)))
 
 	// Convert binary coded decimal to normal decimal numbers
 	//#define RTCLIB_bcdToDec(val) ((uint8_t) (val - 6 * (val >> 4)))
-	#define RTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
+	#define uRTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
 
 
 	#ifdef _VARIANT_ARDUINO_STM32_
-		#define RTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
+		#define uRTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
 	#endif
 
 
-	class RTCLib {
+	class uRTCLib {
 		public:
-			RTCLib();
+			uRTCLib();
 			uint8_t second();
 			uint8_t minute();
 			uint8_t hour();
@@ -57,11 +57,11 @@
 			uint8_t dayOfWeek();
 			void refresh();
 
-			#ifdef RTCLIB_SET
+			#ifdef uRTCLIB_SET
 				void set(uint8_t second, uint8_t minute, uint8_t hour, uint8_t dayOfWeek, uint8_t dayOfMonth, uint8_t month, uint8_t year);
 			#endif
 
-			#ifdef RTCLIB_EEPROM
+			#ifdef uRTCLIB_EEPROM
 				unsigned char eeprom_read(const unsigned int address);
 				void eeprom_write(const unsigned int address, const unsigned char data);
 			#endif

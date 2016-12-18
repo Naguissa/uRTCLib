@@ -13,9 +13,9 @@
  * @created 2015-05-07
  */
 #include <Arduino.h>
-#include "RTCLib.h"
+#include "uRTCLib.h"
 
-RTCLib::RTCLib() {
+uRTCLib::uRTCLib() {
 	#ifndef _VARIANT_ARDUINO_STM32_
 	  Wire.begin();
 	#endif
@@ -23,7 +23,7 @@ RTCLib::RTCLib() {
 }
 
 
-void RTCLib::refresh() {
+void uRTCLib::refresh() {
 	#ifdef _VARIANT_ARDUINO_STM32_
 		RTCLIB_INIT_WIRE();
 	#endif
@@ -49,76 +49,76 @@ void RTCLib::refresh() {
 }
 
 
-uint8_t RTCLib::second() {
+uint8_t uRTCLib::second() {
 	return _second;
 }
 
-uint8_t RTCLib::minute() {
+uint8_t uRTCLib::minute() {
 	return _minute;
 }
 
-uint8_t RTCLib::hour() {
+uint8_t uRTCLib::hour() {
 	return _hour;
 }
 
-uint8_t RTCLib::day() {
+uint8_t uRTCLib::day() {
 	return _day;
 }
 
-uint8_t RTCLib::month() {
+uint8_t uRTCLib::month() {
 	return _month;
 }
 
-uint8_t RTCLib::year() {
+uint8_t uRTCLib::year() {
 	return _year;
 }
 
-uint8_t RTCLib::dayOfWeek() {
+uint8_t uRTCLib::dayOfWeek() {
 	return _dayOfWeek;
 }
 
 
-#ifdef RTCLIB_SET
-	void RTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
+#ifdef uRTCLIB_SET
+	void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 		#ifdef _VARIANT_ARDUINO_STM32_
-			RTCLIB_INIT_WIRE();
+			uRTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(RTCLIB_ADDRESS);
+		Wire.beginTransmission(uRTCLIB_ADDRESS);
 		Wire.write(0); // set next input to start at the seconds register
-		Wire.write(RTCLIB_decToBcd(second)); // set seconds
-		Wire.write(RTCLIB_decToBcd(minute)); // set minutes
-		Wire.write(RTCLIB_decToBcd(hour)); // set hours
-		Wire.write(RTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
-		Wire.write(RTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
-		Wire.write(RTCLIB_decToBcd(month)); // set month
-		Wire.write(RTCLIB_decToBcd(year)); // set year (0 to 99)
+		Wire.write(uRTCLIB_decToBcd(second)); // set seconds
+		Wire.write(uRTCLIB_decToBcd(minute)); // set minutes
+		Wire.write(uRTCLIB_decToBcd(hour)); // set hours
+		Wire.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
+		Wire.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
+		Wire.write(uRTCLIB_decToBcd(month)); // set month
+		Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
 		Wire.endTransmission();
 	}
 #endif
 
 
-#ifdef RTCLIB_EEPROM
-	unsigned char RTCLib::eeprom_read(const unsigned int address) {
+#ifdef uRTCLIB_EEPROM
+	unsigned char uRTCLib::eeprom_read(const unsigned int address) {
 		unsigned int rdata = 0xFF;
 		#ifdef _VARIANT_ARDUINO_STM32_
-			RTCLIB_INIT_WIRE();
+			uRTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(RTCLIB_EE_ADDRESS);
+		Wire.beginTransmission(uRTCLIB_EE_ADDRESS);
 		Wire.write((int)(address >> 8)); // MSB
 		Wire.write((int)(address & 0xFF)); // LSB
 		Wire.endTransmission();
-		Wire.requestFrom(RTCLIB_EE_ADDRESS,1);
+		Wire.requestFrom(uRTCLIB_EE_ADDRESS,1);
 		if (Wire.available()) {
 			rdata = Wire.read();
 		}
 		return rdata;
 	}
 
-	void RTCLib::eeprom_write(const unsigned int address, const unsigned char data) {
+	void uRTCLib::eeprom_write(const unsigned int address, const unsigned char data) {
 		#ifdef _VARIANT_ARDUINO_STM32_
-			RTCLIB_INIT_WIRE();
+			uRTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(RTCLIB_EE_ADDRESS);
+		Wire.beginTransmission(uRTCLIB_EE_ADDRESS);
 		Wire.write((int)(address >> 8)); // MSB
 		Wire.write((int)(address & 0xFF)); // LSB
 		Wire.write(data);
