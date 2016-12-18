@@ -78,7 +78,7 @@ uint8_t uRTCLib::dayOfWeek() {
 }
 
 
-#ifdef uRTCLIB_SET
+#ifdef URTCLIB_SET
 	void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 		#ifdef _VARIANT_ARDUINO_STM32_
 			URTCLIB_INIT_WIRE();
