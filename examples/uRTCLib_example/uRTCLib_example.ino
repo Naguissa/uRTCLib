@@ -3,7 +3,7 @@
 #include "uRTCLib.h"
 
 
-RTCLib rtc;
+uRTCLib rtc;
 
 
 unsigned int pos;
