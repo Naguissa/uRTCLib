@@ -25,27 +25,27 @@ uRTCLib::uRTCLib() {
 
 void uRTCLib::refresh() {
 	#ifdef _VARIANT_ARDUINO_STM32_
-		RTCLIB_INIT_WIRE();
+		URTCLIB_INIT_WIRE();
 	#endif
-	Wire.beginTransmission(RTCLIB_ADDRESS);
+	Wire.beginTransmission(URTCLIB_ADDRESS);
 	Wire.write(0); // set DS3231 register pointer to 00h
 	Wire.endTransmission();
-	Wire.requestFrom(RTCLIB_ADDRESS, 7);
+	Wire.requestFrom(URTCLIB_ADDRESS, 7);
 	// request seven uint8_ts of data starting from register 00h
 	_second = Wire.read();
-	_second = RTCLIB_bcdToDec(_second);
+	_second = uRTCLIB_bcdToDec(_second);
 	_minute = Wire.read();
-	_minute = RTCLIB_bcdToDec(_minute);
+	_minute = uRTCLIB_bcdToDec(_minute);
 	_hour = Wire.read() & 0b111111;
-	_hour = RTCLIB_bcdToDec(_hour);
+	_hour = uRTCLIB_bcdToDec(_hour);
 	_dayOfWeek = Wire.read();
-	_dayOfWeek = RTCLIB_bcdToDec(_dayOfWeek);
+	_dayOfWeek = uRTCLIB_bcdToDec(_dayOfWeek);
 	_day = Wire.read();
-	_day = RTCLIB_bcdToDec(_day);
+	_day = uRTCLIB_bcdToDec(_day);
 	_month = Wire.read();
-	_month = RTCLIB_bcdToDec(_month);
+	_month = uRTCLIB_bcdToDec(_month);
 	_year = Wire.read();
-	_year = RTCLIB_bcdToDec(_year);
+	_year = uRTCLIB_bcdToDec(_year);
 }
 
 
@@ -81,9 +81,9 @@ uint8_t uRTCLib::dayOfWeek() {
 #ifdef uRTCLIB_SET
 	void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 		#ifdef _VARIANT_ARDUINO_STM32_
-			uRTCLIB_INIT_WIRE();
+			URTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(uRTCLIB_ADDRESS);
+		Wire.beginTransmission(URTCLIB_ADDRESS);
 		Wire.write(0); // set next input to start at the seconds register
 		Wire.write(uRTCLIB_decToBcd(second)); // set seconds
 		Wire.write(uRTCLIB_decToBcd(minute)); // set minutes
@@ -97,17 +97,17 @@ uint8_t uRTCLib::dayOfWeek() {
 #endif
 
 
-#ifdef uRTCLIB_EEPROM
+#ifdef URTCLIB_EEPROM
 	unsigned char uRTCLib::eeprom_read(const unsigned int address) {
 		unsigned int rdata = 0xFF;
 		#ifdef _VARIANT_ARDUINO_STM32_
-			uRTCLIB_INIT_WIRE();
+			URTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(uRTCLIB_EE_ADDRESS);
+		Wire.beginTransmission(URTCLIB_EE_ADDRESS);
 		Wire.write((int)(address >> 8)); // MSB
 		Wire.write((int)(address & 0xFF)); // LSB
 		Wire.endTransmission();
-		Wire.requestFrom(uRTCLIB_EE_ADDRESS,1);
+		Wire.requestFrom(URTCLIB_EE_ADDRESS, 1);
 		if (Wire.available()) {
 			rdata = Wire.read();
 		}
@@ -116,9 +116,9 @@ uint8_t uRTCLib::dayOfWeek() {
 
 	void uRTCLib::eeprom_write(const unsigned int address, const unsigned char data) {
 		#ifdef _VARIANT_ARDUINO_STM32_
-			uRTCLIB_INIT_WIRE();
+			URTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(uRTCLIB_EE_ADDRESS);
+		Wire.beginTransmission(URTCLIB_EE_ADDRESS);
 		Wire.write((int)(address >> 8)); // MSB
 		Wire.write((int)(address & 0xFF)); // LSB
 		Wire.write(data);

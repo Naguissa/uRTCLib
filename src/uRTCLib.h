@@ -12,8 +12,8 @@
  * @version 1.0
  * @created 2015-05-07
  */
-#ifndef uRTCLIB
-	#define uRTCLIB
+#ifndef URTCLIB
+	#define URTCLIB
 	#include "Arduino.h"
 	#include "Wire.h"
 	/*
@@ -21,14 +21,14 @@
 	DS3231 ROM 0x57
 	DS3231 RTC 0x68
 	*/
-	#define uRTCLIB_ADDRESS 0x68
-	#define uRTCLIB_EE_ADDRESS 0x57
+	#define URTCLIB_ADDRESS 0x68
+	#define URTCLIB_EE_ADDRESS 0x57
 
 	//Comment to disable RTC-setting function
-	#define uRTCLIB_SET
+	#define URTCLIB_SET
 
 	//Comment to disable EEPROM functionality
-	#define uRTCLIB_EEPROM
+	#define URTCLIB_EEPROM
 
 	// Convert normal decimal numbers to binary coded decimal
 	#define uRTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
@@ -40,7 +40,7 @@
 
 
 	#ifdef _VARIANT_ARDUINO_STM32_
-		#define uRTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
+		#define URTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
 	#endif
 
 
@@ -57,11 +57,11 @@
 			uint8_t dayOfWeek();
 			void refresh();
 
-			#ifdef uRTCLIB_SET
+			#ifdef URTCLIB_SET
 				void set(uint8_t second, uint8_t minute, uint8_t hour, uint8_t dayOfWeek, uint8_t dayOfMonth, uint8_t month, uint8_t year);
 			#endif
 
-			#ifdef uRTCLIB_EEPROM
+			#ifdef URTCLIB_EEPROM
 				unsigned char eeprom_read(const unsigned int address);
 				void eeprom_write(const unsigned int address, const unsigned char data);
 			#endif
