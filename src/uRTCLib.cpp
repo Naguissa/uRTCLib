@@ -27,10 +27,10 @@ void uRTCLib::refresh() {
 	#ifdef _VARIANT_ARDUINO_STM32_
 		URTCLIB_INIT_WIRE();
 	#endif
-	Wire.beginTransmission(URTCLIB_ADDRESS);
+	Wire.beginTransmission(_rtc_address);
 	Wire.write(0); // set DS3231 register pointer to 00h
 	Wire.endTransmission();
-	Wire.requestFrom(URTCLIB_ADDRESS, 7);
+	Wire.requestFrom(_rtc_address, 7);
 	// request seven uint8_ts of data starting from register 00h
 	_second = Wire.read();
 	_second = uRTCLIB_bcdToDec(_second);
@@ -77,13 +77,17 @@ uint8_t uRTCLib::dayOfWeek() {
 	return _dayOfWeek;
 }
 
+void uRTCLib::set_rtc_address(int addr) {
+	_rtc_address = addr;
+}
+
 
 #ifdef URTCLIB_SET
 	void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 		#ifdef _VARIANT_ARDUINO_STM32_
 			URTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(URTCLIB_ADDRESS);
+		Wire.beginTransmission(_rtc_address);
 		Wire.write(0); // set next input to start at the seconds register
 		Wire.write(uRTCLIB_decToBcd(second)); // set seconds
 		Wire.write(uRTCLIB_decToBcd(minute)); // set minutes
@@ -98,16 +102,20 @@ uint8_t uRTCLib::dayOfWeek() {
 
 
 #ifdef URTCLIB_EEPROM
+	void uRTCLib::set_ee_address(int addr) {
+		_ee_address = addr;
+	}
+
 	unsigned char uRTCLib::eeprom_read(const unsigned int address) {
 		unsigned int rdata = 0xFF;
 		#ifdef _VARIANT_ARDUINO_STM32_
 			URTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(URTCLIB_EE_ADDRESS);
+		Wire.beginTransmission(_ee_address);
 		Wire.write((int)(address >> 8)); // MSB
 		Wire.write((int)(address & 0xFF)); // LSB
 		Wire.endTransmission();
-		Wire.requestFrom(URTCLIB_EE_ADDRESS, 1);
+		Wire.requestFrom(_ee_address, 1);
 		if (Wire.available()) {
 			rdata = Wire.read();
 		}
@@ -118,7 +126,7 @@ uint8_t uRTCLib::dayOfWeek() {
 		#ifdef _VARIANT_ARDUINO_STM32_
 			URTCLIB_INIT_WIRE();
 		#endif
-		Wire.beginTransmission(URTCLIB_EE_ADDRESS);
+		Wire.beginTransmission(_ee_address);
 		Wire.write((int)(address >> 8)); // MSB
 		Wire.write((int)(address & 0xFF)); // LSB
 		Wire.write(data);

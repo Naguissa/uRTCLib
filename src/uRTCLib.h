@@ -56,17 +56,24 @@
 			uint8_t seconds();
 			uint8_t dayOfWeek();
 			void refresh();
+			void set_rtc_address(int);
 
 			#ifdef URTCLIB_SET
 				void set(uint8_t second, uint8_t minute, uint8_t hour, uint8_t dayOfWeek, uint8_t dayOfMonth, uint8_t month, uint8_t year);
 			#endif
 
 			#ifdef URTCLIB_EEPROM
+				void set_ee_address(int);
 				unsigned char eeprom_read(const unsigned int address);
 				void eeprom_write(const unsigned int address, const unsigned char data);
 			#endif
 
 		private:
+			int _rtc_address = URTCLIB_ADDRESS;
+			#ifdef URTCLIB_EEPROM
+				int _ee_address = URTCLIB_EE_ADDRESS;
+			#endif
+		
 			uint8_t _second = 0;
 			uint8_t _minute = 0;
 			uint8_t _hour = 0;

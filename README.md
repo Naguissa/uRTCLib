@@ -18,7 +18,7 @@ AT24C32 EEPROM supported
  * Rename to uRTCLib.zip
  * Install library on Arduino
 
- * Optionally you can edit uRTCLib.h to change I2C addresses or disable RTC setting functionality or EEPROM functionality,
+ * Optionally you can edit uRTCLib.h to change I2C default addresses or disable RTC setting functionality or EEPROM functionality.
 
 
 ## Example ##
@@ -30,5 +30,5 @@ Included on example folder, available on Arduino IDE.
 ## Who do I talk to? ##
 
  * [Naguissa](https://github.com/Naguissa)
- * http://www.naguissa.com
- * http://www.foroelectro.net
+ * https://www.naguissa.com
+ * https://www.foroelectro.net

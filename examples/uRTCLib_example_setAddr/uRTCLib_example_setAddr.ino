@@ -29,6 +29,8 @@ delay (2000);
   #else
   Serial.println("Board: Other");
   #endif
+  rtc.set_rtc_address(0x68);
+  rtc.set_ee_address(0x57);
   
 }
 
