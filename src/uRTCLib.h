@@ -66,11 +66,28 @@
 				void set_ee_address(int);
 				unsigned char eeprom_read(const unsigned int address);
 				void eeprom_write(const unsigned int address, const unsigned char data);
+				
+				
+				void write(unsigned int address, byte data);
+				void write(unsigned int address, byte *data, int n);
+				void writeInt(unsigned int address, unsigned int data);
+				void writeLong(unsigned int address, unsigned long data);
+				byte read(unsigned int address);
+				void read(unsigned int address, byte *data, int n);
+				unsigned int readInt(unsigned int address);
+				unsigned long readLong(unsigned int address);
+				void writeFloat( unsigned int address,  float data);
+				float readFloat( unsigned int address);
 			#endif
 
 		private:
 			int _rtc_address = URTCLIB_ADDRESS;
 			#ifdef URTCLIB_EEPROM
+				void read(unsigned int address, byte *data, int offset, int n);
+				void write(unsigned int address, byte *data, int offset, int n);
+				byte _b[8];
+				int _id;
+				byte _pageSize;
 				int _ee_address = URTCLIB_EE_ADDRESS;
 			#endif
 		
