@@ -9,25 +9,51 @@
  * @copyright Naguissa
  * @author Naguissa
  * @email naguissa.com@gmail.com
- * @version 1.0
+ * @version 3.2.0
  * @created 2015-05-07
  */
 #include <Arduino.h>
 #include <Wire.h>
 #include "uRTCLib.h"
 
+
+/**
+ * Constructor
+ */
 uRTCLib::uRTCLib() {
-	#ifndef _VARIANT_ARDUINO_STM32_
 	  Wire.begin();
-	#endif
 	//  refresh();
 }
 
+/**
+ * Constructor
+ *
+ * @param int rtc_address I2C address of RTC
+ */
+uRTCLib::uRTCLib(const int rtc_address) {
+	_rtc_address = rtc_address;
+	Wire.begin();
+	//  refresh();
+}
 
+/**
+ * Constructor
+ *
+ * @param int rtc_address I2C address of RTC
+ * @param int ee_address I2C address of EEPROM
+ */
+uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
+	_rtc_address = rtc_address;
+	_ee_address = ee_address;
+	Wire.begin();
+	//  refresh();
+}
+
+/**
+ * Refresh data from HW RTC
+ */
 void uRTCLib::refresh() {
-	#ifdef _VARIANT_ARDUINO_STM32_
-		URTCLIB_INIT_WIRE();
-	#endif
+	URTCLIB_INIT_WIRE()
 	Wire.beginTransmission(_rtc_address);
 	Wire.write(0); // set DS3231 register pointer to 00h
 	Wire.endTransmission();
@@ -49,206 +75,243 @@ void uRTCLib::refresh() {
 	_year = uRTCLIB_bcdToDec(_year);
 }
 
-
+/**
+ * Returns actual second
+ *
+ * @return uint8_t Current stored second
+ */
 uint8_t uRTCLib::second() {
 	return _second;
 }
 
+/**
+ * Returns actual minute
+ *
+ * @return uint8_t Current stored minute
+ */
 uint8_t uRTCLib::minute() {
 	return _minute;
 }
 
+
+/**
+ * Returns actual hour
+ *
+ * @return uint8_t Current stored hour
+ */
 uint8_t uRTCLib::hour() {
 	return _hour;
 }
 
+/**
+ * Returns actual day
+ *
+ * @return uint8_t Current stored day
+ */
 uint8_t uRTCLib::day() {
 	return _day;
 }
 
+/**
+ * Returns actual month
+ *
+ * @return uint8_t Current stored month
+ */
 uint8_t uRTCLib::month() {
 	return _month;
 }
 
+/**
+ * Returns actual year
+ *
+ * @return uint8_t Current stored year
+ */
 uint8_t uRTCLib::year() {
 	return _year;
 }
 
+/**
+ * Returns actual Day Of Week
+ *
+ * @return uint8_t Current stored Day Of Week
+ */
 uint8_t uRTCLib::dayOfWeek() {
 	return _dayOfWeek;
 }
 
-void uRTCLib::set_rtc_address(int addr) {
+/**
+ * Sets RTC i2 addres
+ *
+ * @param int RTC i2C address
+ */
+void uRTCLib::set_rtc_address(const int addr) {
 	_rtc_address = addr;
 }
 
 
-#ifdef URTCLIB_SET
-	void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
-		#ifdef _VARIANT_ARDUINO_STM32_
-			URTCLIB_INIT_WIRE();
-		#endif
-		Wire.beginTransmission(_rtc_address);
-		Wire.write(0); // set next input to start at the seconds register
-		Wire.write(uRTCLIB_decToBcd(second)); // set seconds
-		Wire.write(uRTCLIB_decToBcd(minute)); // set minutes
-		Wire.write(uRTCLIB_decToBcd(hour)); // set hours
-		Wire.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
-		Wire.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
-		Wire.write(uRTCLIB_decToBcd(month)); // set month
-		Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
-		Wire.endTransmission();
-	}
-#endif
+/**
+ * Sets RTC datetime data
+ *
+ * @param uint8_t second second to set to HW RTC
+ * @param uint8_t minute minute to set to HW RTC
+ * @param uint8_t hour hour to set to HW RTC
+ * @param uint8_t dayOfWeek day of week to set to HW RTC
+ * @param uint8_t dayOfMonth day of month to set to HW RTC
+ * @param uint8_t month month to set to HW RTC
+ * @param uint8_t year year to set to HW RTC
+ */
+void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
+	URTCLIB_INIT_WIRE()
+	Wire.beginTransmission(_rtc_address);
+	Wire.write(0); // set next input to start at the seconds register
+	Wire.write(uRTCLIB_decToBcd(second)); // set seconds
+	Wire.write(uRTCLIB_decToBcd(minute)); // set minutes
+	Wire.write(uRTCLIB_decToBcd(hour)); // set hours
+	Wire.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
+	Wire.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
+	Wire.write(uRTCLIB_decToBcd(month)); // set month
+	Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
+	Wire.endTransmission();
+}
 
 
-#ifdef URTCLIB_EEPROM
-	void uRTCLib::set_ee_address(int addr) {
-		_ee_address = addr;
-	}
+/**
+ * Sets RTC EEPROM i2 addres
+ *
+ * @param int addr RTC i2C address
+ */
+void uRTCLib::set_ee_address(const uint8_t addr) {
+	_ee_address = addr;
+}
 
-	unsigned char uRTCLib::eeprom_read(const unsigned int address) {
-		unsigned int rdata = 0xFF;
-		#ifdef _VARIANT_ARDUINO_STM32_
-			URTCLIB_INIT_WIRE();
-		#endif
-		Wire.beginTransmission(_ee_address);
-		Wire.write((int)(address >> 8)); // MSB
-		Wire.write((int)(address & 0xFF)); // LSB
-		Wire.endTransmission();
+
+/**********
+ * EEPROM *
+ **********/
+
+/**
+ * Read one byte
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @return char read byte
+ */
+uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
+	unsigned int rdata = 0xFF;
+	URTCLIB_INIT_WIRE()
+	Wire.beginTransmission(_ee_address);
+	Wire.write((int)(address >> 8)); // MSB
+	Wire.write((int)(address & 0xFF)); // LSB
+	if (Wire.endTransmission()==0) {
 		Wire.requestFrom(_ee_address, 1);
 		if (Wire.available()) {
-			rdata = Wire.read();
+			rdata = (byte) Wire.read();
 		}
-		return rdata;
 	}
-
-	void uRTCLib::eeprom_write(const unsigned int address, const unsigned char data) {
-		#ifdef _VARIANT_ARDUINO_STM32_
-			URTCLIB_INIT_WIRE();
-		#endif
-		Wire.beginTransmission(_ee_address);
-		Wire.write((int)(address >> 8)); // MSB
-		Wire.write((int)(address & 0xFF)); // LSB
-		Wire.write(data);
-		delay(5); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-		Wire.endTransmission();
-	}
-	
-	void uRTCLib::writeFloat(unsigned int address, float data) {
-	write(address, (byte*)&data, 4);
-}
-
-float uRTCLib::readFloat(unsigned int address) {
-	read(address, _b, 4);
-	return *(float*)&_b[0];
-}
-	
-/**
- * Read byte
- */
-byte uRTCLib::read(unsigned int address) {
-	byte b = 0;
-	int r = 0;
-	Wire.beginTransmission(_id);
-    if (Wire.endTransmission()==0) {
-     	Wire.beginTransmission(_id);
-    	Wire.write(address >> 8);
-    	Wire.write(address & 0xFF);
-    	if (Wire.endTransmission()==0) {
-			Wire.requestFrom(_id, 1);
-			while (Wire.available() > 0 && r<1) {
-				b = (byte)Wire.read();
-				r++;
-			}
-    	}
-    }
-    return b;
+	return rdata;
 }
 
 /**
- * Read sequence of n bytes
+ * Read sequence of n bytes. Optionally from offset
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @param byte* data Pinter to where read data to
+ * @param uint8_t n number of bytes to read
+ * @return char read byte
  */
-void uRTCLib::read(unsigned int address, byte *data, int n) {
-	int c = n;
-	int offD = 0;
-	// read until are n bytes read
-	while (c > 0) {
-		// read maximal 32 bytes
-		int nc = c;
-		if (nc > 32)
-			nc = 32;
-		read(address, data, offD, nc);
-		address+=nc;
-		offD+=nc;
-		c-=nc;
+void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8_t n) {
+	for (uint8_t i = 0; i < n; i++) {
+		data[i] = _eeprom_read(address + i);
 	}
 }
 
 
 /**
- * Read sequence of n bytes to offset
+ * Read sequence of n bytes. Optionally from offset
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @param byte* data Pinter to where read data to
+ * @param uint8_t n number of bytes to read
+ * @param uint8_t offset offset where address start read from
+ * @return char read byte
  */
-void uRTCLib::read(unsigned int address, byte *data, int offset, int n) {
-	Wire.beginTransmission(_id);
-    if (Wire.endTransmission()==0) {
-     	Wire.beginTransmission(_id);
-    	Wire.write(address >> 8);
-    	Wire.write(address & 0xFF);
-    	if (Wire.endTransmission()==0) {
-			int r = 0;
-    		Wire.requestFrom(_id, n);
-			while (Wire.available() > 0 && r<n) {
-				data[offset+r] = (byte)Wire.read();
-				r++;
-			}
-    	}
-    }
+void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8_t n, const uint8_t offset) {
+	eeprom_read(address, data + offset, n);
 }
-	
-	
-	
-	/**
+
+
+
+/**
+ * Read a byte from EEPROM address
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @return byte read data
+ */
+byte uRTCLib::eeprom_read(const unsigned int address) {
+	byte _b;
+	eeprom_read(address, (uint8_t *) &_b, 1);
+	return _b;
+  }
+
+
+/**
+ * Write one byte to EEPROM
+ *
+ * @param unsigned int address Address inside EEPROM to write to
+ * @param uint8_t data byte to write
+ * @return bool true if successful
+ */
+bool uRTCLib::_eeprom_write(const unsigned int address, const uint8_t data) {
+	URTCLIB_INIT_WIRE()
+	Wire.beginTransmission(_ee_address);
+	Wire.write((int)(address >> 8)); // MSB
+	Wire.write((int)(address & 0xFF)); // LSB
+	Wire.write(data);
+	delay(5); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
+	return Wire.endTransmission() == 0;
+}
+
+
+/**
  * Write sequence of n bytes
+ *
+ * @param address uint initial addesss to write to
+ * @param data *uint8_t pointer to data to write (without offset)
+ * @param n uint8_t number of bytes to write
+ * @return bool true if successful
  */
-void uRTCLib::write(unsigned int address, byte *data, int n) {
-	// status quo
-	int c = n;						// bytes left to write
-	int offD = 0;					// current offset in data pointer
-	int offP;						// current offset in page
-	int nc = 0;						// next n bytes to write
-
-	// write alle bytes in multiple steps
-	while (c > 0) {
-		// calc offset in page
-		offP = address % _pageSize;
-		// maximal 30 bytes to write
-		nc = min(min(c, 30), _pageSize - offP);
-		write(address, data, offD, nc);
-		c-=nc;
-		offD+=nc;
-		address+=nc;
+bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t *data, const uint8_t n) {
+	bool r = true;
+	for (uint8_t  i = 0; i < n; i++) {
+		r &= _eeprom_write(address + i, *(data + i));
+		if (!r) {
+			return false;
+		}
 	}
+	return r;
 }
+
 
 /**
  * Write sequence of n bytes from offset
+ *
+ * @param address uint initial addesss to write to
+ * @param data *uint8_t pointer to data to write (without offset)
+ * @param n uint8_t number of bytes to write
+ * @param offset uint8_t Offset from address to write to
+ * @return bool true if successful
  */
-void uRTCLib::write(unsigned int address, byte *data, int offset, int n) {
-    Wire.beginTransmission(_id);
-    if (Wire.endTransmission()==0) {
-     	Wire.beginTransmission(_id);
-    	Wire.write(address >> 8);
-    	Wire.write(address & 0xFF);
-    	byte *adr = data+offset;
-    	Wire.write(adr, n);
-    	Wire.endTransmission();
-    	delay(20);
-    }
+bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t *data, const uint8_t n, const uint8_t offset) {
+	return eeprom_write(address + offset, data, n);
 }
-	
-	
-	
-	
-#endif
+
+/**
+ * Write one bytes
+ *
+ * @param address uint initial addesss to write to
+ * @param data uint8_t data to write
+ * @return bool true if successful
+ */
+bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t data) {
+	return _eeprom_write(address, data);
+}
 

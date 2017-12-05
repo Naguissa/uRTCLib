@@ -9,7 +9,7 @@
  * @copyright Naguissa
  * @author Naguissa
  * @email naguissa.com@gmail.com
- * @version 1.0
+ * @version 3.2.0
  * @created 2015-05-07
  */
 #ifndef URTCLIB
@@ -24,73 +24,55 @@
 	#define URTCLIB_ADDRESS 0x68
 	#define URTCLIB_EE_ADDRESS 0x57
 
-	//Comment to disable RTC-setting function
-	#define URTCLIB_SET
-
-	//Comment to disable EEPROM functionality
-	#define URTCLIB_EEPROM
-
 	// Convert normal decimal numbers to binary coded decimal
 	#define uRTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
-	//#define RTCLIB_decToBcd(val) ((uint8_t) (val + 6 * (val / 10)))
 
 	// Convert binary coded decimal to normal decimal numbers
-	//#define RTCLIB_bcdToDec(val) ((uint8_t) (val - 6 * (val >> 4)))
 	#define uRTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
 
 
 	#ifdef _VARIANT_ARDUINO_STM32_
 		#define URTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
+	#else
+		#define URTCLIB_INIT_WIRE()
 	#endif
 
 
 	class uRTCLib {
 		public:
+			// Constructors
 			uRTCLib();
+			uRTCLib(const int);
+			uRTCLib(const int, const int);
+			// RTC functions
+			void refresh();
 			uint8_t second();
 			uint8_t minute();
 			uint8_t hour();
 			uint8_t day();
 			uint8_t month();
 			uint8_t year();
-			uint8_t seconds();
 			uint8_t dayOfWeek();
-			void refresh();
-			void set_rtc_address(int);
-
-			#ifdef URTCLIB_SET
-				void set(uint8_t second, uint8_t minute, uint8_t hour, uint8_t dayOfWeek, uint8_t dayOfMonth, uint8_t month, uint8_t year);
-			#endif
-
-			#ifdef URTCLIB_EEPROM
-				void set_ee_address(int);
-				unsigned char eeprom_read(const unsigned int address);
-				void eeprom_write(const unsigned int address, const unsigned char data);
-				
-				
-				void write(unsigned int address, byte data);
-				void write(unsigned int address, byte *data, int n);
-				void writeInt(unsigned int address, unsigned int data);
-				void writeLong(unsigned int address, unsigned long data);
-				byte read(unsigned int address);
-				void read(unsigned int address, byte *data, int n);
-				unsigned int readInt(unsigned int address);
-				unsigned long readLong(unsigned int address);
-				void writeFloat( unsigned int address,  float data);
-				float readFloat( unsigned int address);
-			#endif
+			void set_rtc_address(const int);
+			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
+			// EEPROM
+			void set_ee_address(const uint8_t);
+			// EEPROM read functions
+			void eeprom_read(const unsigned int, uint8_t *, const uint8_t);
+			void eeprom_read(const unsigned int, uint8_t *, const uint8_t, const uint8_t);
+			byte eeprom_read(const unsigned int);
+			template <typename TR> TR eeprom_read(const unsigned int);
+			// EEPROM write functions
+			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t);
+			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t, const uint8_t);
+			bool eeprom_write(const unsigned int, const uint8_t);
+ 			template <typename TW> bool eeprom_write(const unsigned int, TW);
 
 		private:
+			// Adresses
 			int _rtc_address = URTCLIB_ADDRESS;
-			#ifdef URTCLIB_EEPROM
-				void read(unsigned int address, byte *data, int offset, int n);
-				void write(unsigned int address, byte *data, int offset, int n);
-				byte _b[8];
-				int _id;
-				byte _pageSize;
-				int _ee_address = URTCLIB_EE_ADDRESS;
-			#endif
-		
+			int _ee_address = URTCLIB_EE_ADDRESS;
+			// RTC rad data
 			uint8_t _second = 0;
 			uint8_t _minute = 0;
 			uint8_t _hour = 0;
@@ -98,8 +80,55 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
+			// EEPROM read and write private functions - works with bytes
+			uint8_t _eeprom_read(const unsigned int);
+			bool _eeprom_write(const unsigned int, const uint8_t);
+			
+			// STM32 fix - initi aux. flag
 			#ifdef _VARIANT_ARDUINO_STM32_
 				bool _do_init = true;
 			#endif
 	};
+		
+		
+/**
+ * Write a byte to EEPROM address
+ *
+ * @param unsigned int address Address inside EEPROM to write to
+ * @param data <uint8_t> data to write
+ */
+//bool uRTCLib::eeprom_write<uint8_t>(const unsigned int address, uint8_t data) {
+//template <> bool uRTCLib::eeprom_write<uint8_t>(const unsigned int address, uint8_t data) {
+//	return _eeprom_write(address, data);
+//}
+
+
+	
+	
 #endif
+
+// Templates must be here because Arduino compiler incoptability to declare them on .cpp fil
+
+/**
+ * Write any datatype to EEPROM address
+ *
+ * @param unsigned int address Address inside EEPROM to write to
+ * @param data <typename> data to write
+ */
+template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, TW data) {
+	return eeprom_write(address, (uint8_t *) &data, (uint8_t) sizeof(TW));
+}
+
+
+/**
+ * Read any datatype from EEPROM address
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @return <typename> read data
+ */
+template <typename TR> TR uRTCLib::eeprom_read(const unsigned int address) {
+	TR _b;
+	eeprom_read(address, (uint8_t *) &_b, sizeof(TR));
+	return _b;
+}
+
