@@ -14,12 +14,13 @@ AT24C32 EEPROM supported
 
 ## How do I get set up? ##
 
+You can get it from Arduino libraries directly.
+
+For manual installation:
+
  * Get the ZIP.
  * Rename to uRTCLib.zip
  * Install library on Arduino
-
- * Optionally you can edit uRTCLib.h to change I2C default addresses or disable RTC setting functionality or EEPROM functionality.
-
 
 ## Example ##
 
