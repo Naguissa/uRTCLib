@@ -196,7 +196,7 @@ void uRTCLib::set_ee_address(const uint8_t addr) {
  * @return char read byte
  */
 uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
-	unsigned int rdata = 0xFF;
+	uint8_t rdata = 0xFF;
 	URTCLIB_INIT_WIRE()
 	Wire.beginTransmission(_ee_address);
 	Wire.write((int)(address >> 8)); // MSB
@@ -204,7 +204,7 @@ uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
 	if (Wire.endTransmission()==0) {
 		Wire.requestFrom(_ee_address, 1);
 		if (Wire.available()) {
-			rdata = (byte) Wire.read();
+			rdata = (uint8_t) Wire.read();
 		}
 	}
 	return rdata;
@@ -220,7 +220,7 @@ uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
  */
 void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8_t n) {
 	for (uint8_t i = 0; i < n; i++) {
-		data[i] = _eeprom_read(address + i);
+		*(data + i) = _eeprom_read(address + i);
 	}
 }
 
@@ -246,12 +246,9 @@ void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8
  * @param unsigned int address Address inside EEPROM to read from
  * @return byte read data
  */
-byte uRTCLib::eeprom_read(const unsigned int address) {
-	byte _b;
-	eeprom_read(address, (uint8_t *) &_b, 1);
-	return _b;
-  }
-
+uint8_t uRTCLib::eeprom_read(const unsigned int address) {
+	return _eeprom_read(address);
+}
 
 /**
  * Write one byte to EEPROM
@@ -282,7 +279,7 @@ bool uRTCLib::_eeprom_write(const unsigned int address, const uint8_t data) {
 bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t *data, const uint8_t n) {
 	bool r = true;
 	for (uint8_t  i = 0; i < n; i++) {
-		r &= _eeprom_write(address + i, *(data + i));
+		r &= _eeprom_write(address + i, (uint8_t) *(data + i));
 		if (!r) {
 			return false;
 		}

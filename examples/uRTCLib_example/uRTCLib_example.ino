@@ -16,34 +16,56 @@ delay (2000);
 	Serial.println("Serial OK");
 	//  Max position: 32767
 
-	// Testing template
-	rtc.eeprom_write(0, (int) 32101);
-	rtc.eeprom_write(2, 3.14159);
-	rtc.eeprom_write(6, 'A');
+	// Wire.begin(0, 2); // D3 and D4 on ESP8266
 
-	for(pos = 7; pos < 1000; pos++) {
-		rtc.eeprom_write(pos, (unsigned char) pos % 256);
+
+	int inttmp = 32101;
+	float floattmp = 3.14159;
+	char chartmp = 'A';
+
+	// Testing template
+	if (!rtc.eeprom_write(0, inttmp)) {
+		Serial.println("Failed to store INT");
+	}
+	if (!rtc.eeprom_write(4, floattmp)) {
+		Serial.println("Failed to store FLOAT");
+	}
+	if (!rtc.eeprom_write(8, chartmp)) {
+		Serial.println("Failed to store CHAR");
 	}
 
-	// Only used once, then disabled
-	//  rtc.set(0, 42, 16, 6, 2, 5, 15);
+	rtc.set(0, 42, 16, 6, 2, 5, 15);
 	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
 
-	pos = 7;
+
+	inttmp = 0;
+	floattmp = 0;
+	chartmp = 0;
+
 
 	#ifdef _VARIANT_ARDUINO_STM32_
 		Serial.println("Board: STM32");
 	#else
 		Serial.println("Board: Other");
 	#endif
- 
+
 	Serial.print("int: ");
-	Serial.print((int) rtc.eeprom_read(0));
+	rtc.eeprom_read(0, &inttmp);
+	Serial.print(inttmp);
 	Serial.print("; float: ");
-	Serial.print((float) rtc.eeprom_read(2));
+	rtc.eeprom_read(4, &floattmp);
+	Serial.print(floattmp);
 	Serial.print("; char: ");
-	Serial.print((char) rtc.eeprom_read(6));
+	rtc.eeprom_read(8, &chartmp);
+	Serial.print(chartmp);
 	Serial.println();
+
+
+	for(pos = 9; pos < 1000; pos++) {
+		rtc.eeprom_write(pos, (unsigned char) pos % 256);
+	}
+
+	pos = 0;
 }
 
 void loop() {

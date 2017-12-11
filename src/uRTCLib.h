@@ -60,8 +60,8 @@
 			// EEPROM read functions
 			void eeprom_read(const unsigned int, uint8_t *, const uint8_t);
 			void eeprom_read(const unsigned int, uint8_t *, const uint8_t, const uint8_t);
-			byte eeprom_read(const unsigned int);
-			template <typename TR> TR eeprom_read(const unsigned int);
+			template <typename TR> void eeprom_read(const unsigned int, TR *);
+			uint8_t eeprom_read(const unsigned int);
 			// EEPROM write functions
 			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t);
 			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t, const uint8_t);
@@ -83,14 +83,14 @@
 			// EEPROM read and write private functions - works with bytes
 			uint8_t _eeprom_read(const unsigned int);
 			bool _eeprom_write(const unsigned int, const uint8_t);
-			
+
 			// STM32 fix - initi aux. flag
 			#ifdef _VARIANT_ARDUINO_STM32_
 				bool _do_init = true;
 			#endif
 	};
-		
-		
+
+
 /**
  * Write a byte to EEPROM address
  *
@@ -103,8 +103,8 @@
 //}
 
 
-	
-	
+
+
 #endif
 
 // Templates must be here because Arduino compiler incoptability to declare them on .cpp fil
@@ -126,9 +126,7 @@ template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, TW
  * @param unsigned int address Address inside EEPROM to read from
  * @return <typename> read data
  */
-template <typename TR> TR uRTCLib::eeprom_read(const unsigned int address) {
-	TR _b;
-	eeprom_read(address, (uint8_t *) &_b, sizeof(TR));
-	return _b;
+template <typename TR> void uRTCLib::eeprom_read(const unsigned int address, TR *data) {
+	eeprom_read(address, (uint8_t *) data, sizeof(TR));
 }
 
