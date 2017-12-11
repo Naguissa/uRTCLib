@@ -14,7 +14,7 @@ AT24C32 EEPROM supported
 
 ## How do I get set up? ##
 
-You can get it from Arduino libraries directly.
+You can get it from Arduino libraries directly, searching by uRTCLib.
 
 For manual installation:
 
