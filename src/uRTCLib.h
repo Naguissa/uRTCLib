@@ -14,8 +14,8 @@
  */
 #ifndef URTCLIB
 	#define URTCLIB
-	#include "Arduino.h"
-	#include "Wire.h"
+	#include <Arduino.h>
+	#include <Wire.h>
 	/*
 	RTC I2C Address:
 	DS3231 ROM 0x57
@@ -55,18 +55,40 @@
 			uint8_t dayOfWeek();
 			void set_rtc_address(const int);
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
-			// EEPROM
-			void set_ee_address(const uint8_t);
-			// EEPROM read functions
-			void eeprom_read(const unsigned int, uint8_t *, const uint8_t);
-			void eeprom_read(const unsigned int, uint8_t *, const uint8_t, const uint8_t);
-			template <typename TR> void eeprom_read(const unsigned int, TR *);
-			uint8_t eeprom_read(const unsigned int);
-			// EEPROM write functions
-			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t);
-			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t, const uint8_t);
-			bool eeprom_write(const unsigned int, const uint8_t);
- 			template <typename TW> bool eeprom_write(const unsigned int, TW);
+/**
+ * Write any datatype from EEPROM address
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @return <typename> read data
+ */
+
+	template <typename T> void eeprom_write(const uint16_t address,const T &data) {
+		const uint8_t* bytePtrTW = (const uint8_t*)&data;
+		Wire.beginTransmission(URTCLIB_EE_ADDRESS);
+		Wire.write(address >> 8); // MSB
+		Wire.write(address & 0xFF); // LSB
+			for (uint8_t i = 0; i < sizeof(T); i++)
+			Wire.write(*bytePtrTW++);
+		Wire.endTransmission();
+	}
+
+
+/**
+ * Read any datatype from EEPROM address
+ *
+ * @param unsigned int address Address inside EEPROM to read from
+ * @return <typename> read data
+ */
+	template <typename T> void eeprom_read(const uint16_t address, T &data) {
+		uint8_t* bytePtrTR      = (uint8_t*)&data;
+		Wire.beginTransmission(URTCLIB_EE_ADDRESS);
+		Wire.write(address >> 8); // MSB
+		Wire.write(address & 0xFF); // LSB
+		Wire.endTransmission();
+		Wire.requestFrom(URTCLIB_EE_ADDRESS,  sizeof(T));
+		for (uint8_t i = 0; i < sizeof(T); i++)
+			if (Wire.available()) *bytePtrTR++ = Wire.read();
+}
 
 		private:
 			// Adresses
@@ -80,53 +102,14 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
-			// EEPROM read and write private functions - works with bytes
-			uint8_t _eeprom_read(const unsigned int);
-			bool _eeprom_write(const unsigned int, const uint8_t);
-
+	
 			// STM32 fix - initi aux. flag
 			#ifdef _VARIANT_ARDUINO_STM32_
 				bool _do_init = true;
 			#endif
 	};
-
-
-/**
- * Write a byte to EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param data <uint8_t> data to write
- */
-//bool uRTCLib::eeprom_write<uint8_t>(const unsigned int address, uint8_t data) {
-//template <> bool uRTCLib::eeprom_write<uint8_t>(const unsigned int address, uint8_t data) {
-//	return _eeprom_write(address, data);
-//}
-
-
-
+	
 
 #endif
 
-// Templates must be here because Arduino compiler incoptability to declare them on .cpp fil
-
-/**
- * Write any datatype to EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param data <typename> data to write
- */
-template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, TW data) {
-	return eeprom_write(address, (uint8_t *) &data, (uint8_t) sizeof(TW));
-}
-
-
-/**
- * Read any datatype from EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to read from
- * @return <typename> read data
- */
-template <typename TR> void uRTCLib::eeprom_read(const unsigned int address, TR *data) {
-	eeprom_read(address, (uint8_t *) data, sizeof(TR));
-}
 
