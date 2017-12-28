@@ -17,6 +17,7 @@ delay (2000);
 	//  Max position: 32767
 
 	// Wire.begin(0, 2); // D3 and D4 on ESP8266
+	Wire.begin();
 
 
 	int inttmp = 32101;

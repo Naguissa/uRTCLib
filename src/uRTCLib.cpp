@@ -17,13 +17,12 @@
 #include "uRTCLib.h"
 
 
-/**
- * Constructor
- */
-uRTCLib::uRTCLib() {
-	  Wire.begin();
-	//  refresh();
-}
+///**
+// * Constructor
+// */
+//uRTCLib::uRTCLib() {
+//	//  refresh();
+//}
 
 /**
  * Constructor
@@ -32,7 +31,6 @@ uRTCLib::uRTCLib() {
  */
 uRTCLib::uRTCLib(const int rtc_address) {
 	_rtc_address = rtc_address;
-	Wire.begin();
 	//  refresh();
 }
 
@@ -45,7 +43,6 @@ uRTCLib::uRTCLib(const int rtc_address) {
 uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
 	_rtc_address = rtc_address;
 	_ee_address = ee_address;
-	Wire.begin();
 	//  refresh();
 }
 
@@ -53,7 +50,6 @@ uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
  * Refresh data from HW RTC
  */
 void uRTCLib::refresh() {
-	URTCLIB_INIT_WIRE()
 	Wire.beginTransmission(_rtc_address);
 	Wire.write(0); // set DS3231 register pointer to 00h
 	Wire.endTransmission();
@@ -161,7 +157,6 @@ void uRTCLib::set_rtc_address(const int addr) {
  * @param uint8_t year year to set to HW RTC
  */
 void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
-	URTCLIB_INIT_WIRE()
 	Wire.beginTransmission(_rtc_address);
 	Wire.write(0); // set next input to start at the seconds register
 	Wire.write(uRTCLIB_decToBcd(second)); // set seconds
@@ -197,7 +192,6 @@ void uRTCLib::set_ee_address(const uint8_t addr) {
  */
 uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
 	uint8_t rdata = 0xFF;
-	URTCLIB_INIT_WIRE()
 	Wire.beginTransmission(_ee_address);
 	Wire.write((int)(address >> 8)); // MSB
 	Wire.write((int)(address & 0xFF)); // LSB
@@ -258,7 +252,6 @@ uint8_t uRTCLib::eeprom_read(const unsigned int address) {
  * @return bool true if successful
  */
 bool uRTCLib::_eeprom_write(const unsigned int address, const uint8_t data) {
-	URTCLIB_INIT_WIRE()
 	Wire.beginTransmission(_ee_address);
 	Wire.write((int)(address >> 8)); // MSB
 	Wire.write((int)(address & 0xFF)); // LSB

@@ -30,14 +30,6 @@
 	// Convert binary coded decimal to normal decimal numbers
 	#define uRTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
 
-
-	#ifdef _VARIANT_ARDUINO_STM32_
-		#define URTCLIB_INIT_WIRE() if (_do_init) { _do_init = false; Wire.begin(); }
-	#else
-		#define URTCLIB_INIT_WIRE()
-	#endif
-
-
 	class uRTCLib {
 		public:
 			// Constructors

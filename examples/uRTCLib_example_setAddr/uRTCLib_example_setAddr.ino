@@ -14,6 +14,9 @@ delay (2000);
 	Serial.println("Serial OK");
 	//  Max position: 32767
 
+	// Wire.begin(0, 2); // D3 and D4 on ESP8266
+	Wire.begin();
+
 	for(pos = 0; pos < 1000; pos++) {
 		rtc.eeprom_write(pos, (unsigned char) pos % 256);
 	}
