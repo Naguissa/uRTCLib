@@ -75,50 +75,32 @@
 			// EEPROM read and write private functions - works with bytes
 			uint8_t _eeprom_read(const unsigned int);
 			bool _eeprom_write(const unsigned int, const uint8_t);
-
-			// STM32 fix - initi aux. flag
-			#ifdef _VARIANT_ARDUINO_STM32_
-				bool _do_init = true;
-			#endif
 	};
 
 
-/**
- * Write a byte to EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param data <uint8_t> data to write
- */
-//bool uRTCLib::eeprom_write<uint8_t>(const unsigned int address, uint8_t data) {
-//template <> bool uRTCLib::eeprom_write<uint8_t>(const unsigned int address, uint8_t data) {
-//	return _eeprom_write(address, data);
-//}
+	// Templates must be here because Arduino compiler incoptability to declare them on .cpp fil
+
+	/**
+	 * Write any datatype to EEPROM address
+	 *
+	 * @param unsigned int address Address inside EEPROM to write to
+	 * @param data <typename> data to write
+	 */
+	template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, TW data) {
+		return eeprom_write(address, (uint8_t *) &data, (uint8_t) sizeof(TW));
+	}
 
 
-
+	/**
+	 * Read any datatype from EEPROM address
+	 *
+	 * @param unsigned int address Address inside EEPROM to read from
+	 * @return <typename> read data
+	 */
+	template <typename TR> void uRTCLib::eeprom_read(const unsigned int address, TR *data) {
+		eeprom_read(address, (uint8_t *) data, sizeof(TR));
+	}
 
 #endif
 
-// Templates must be here because Arduino compiler incoptability to declare them on .cpp fil
-
-/**
- * Write any datatype to EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param data <typename> data to write
- */
-template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, TW data) {
-	return eeprom_write(address, (uint8_t *) &data, (uint8_t) sizeof(TW));
-}
-
-
-/**
- * Read any datatype from EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to read from
- * @return <typename> read data
- */
-template <typename TR> void uRTCLib::eeprom_read(const unsigned int address, TR *data) {
-	eeprom_read(address, (uint8_t *) data, sizeof(TR));
-}
 
