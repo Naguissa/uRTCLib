@@ -30,6 +30,18 @@
 	// Convert binary coded decimal to normal decimal numbers
 	#define uRTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
 
+	// ESP8266 yield function
+	#if ARDUINO_ARCH_ESP8266
+		#define uRTCLIB_YIELD yield();
+	#else
+		#define uRTCLIB_YIELD
+	#endif
+	
+	// Wire delay
+	#define uRTCLIB_WIRE_DELAY 5
+	
+	
+
 	class uRTCLib {
 		public:
 			// Constructors
@@ -50,16 +62,14 @@
 			// EEPROM
 			void set_ee_address(const uint8_t);
 			// EEPROM read functions
-			void eeprom_read(const unsigned int, uint8_t *, const uint8_t);
-			void eeprom_read(const unsigned int, uint8_t *, const uint8_t, const uint8_t);
+			void eeprom_read(const unsigned int, byte *, const uint8_t);
 			template <typename TR> void eeprom_read(const unsigned int, TR *);
-			uint8_t eeprom_read(const unsigned int);
+			byte eeprom_read(const unsigned int);
 			// EEPROM write functions
-			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t);
-			bool eeprom_write(const unsigned int, const uint8_t *, const uint8_t, const uint8_t);
-			bool eeprom_write(const unsigned int, const uint8_t);
- 			template <typename TW> bool eeprom_write(const unsigned int, TW);
-
+			bool eeprom_write(const unsigned int, void *, const uint8_t);
+			bool eeprom_write(const unsigned int, char);
+			bool eeprom_write(const unsigned int, unsigned char);
+ 			template <typename TW> bool eeprom_write(const unsigned int, const TW);
 		private:
 			// Adresses
 			int _rtc_address = URTCLIB_ADDRESS;
@@ -73,8 +83,15 @@
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
 			// EEPROM read and write private functions - works with bytes
-			uint8_t _eeprom_read(const unsigned int);
-			bool _eeprom_write(const unsigned int, const uint8_t);
+			byte _eeprom_read(const unsigned int);
+			bool _eeprom_write(const unsigned int, const byte);
+	// Fix for STM32 1st write error
+	#ifdef _VARIANT_ARDUINO_STM32_
+		bool init = false;
+		#define uRTCLIB_STM32_INIT_FIX() { if (!init) { init = true;  _eeprom_read(0); delay(10); } }
+	#else
+		#define uRTCLIB_STM32_INIT_FIX()
+	#endif
 	};
 
 
@@ -86,8 +103,8 @@
 	 * @param unsigned int address Address inside EEPROM to write to
 	 * @param data <typename> data to write
 	 */
-	template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, TW data) {
-		return eeprom_write(address, (uint8_t *) &data, (uint8_t) sizeof(TW));
+	template <typename TW> bool uRTCLib::eeprom_write(const unsigned int address, const TW data) {
+		return eeprom_write(address, (void *) &data, sizeof(TW));
 	}
 
 
@@ -98,9 +115,8 @@
 	 * @return <typename> read data
 	 */
 	template <typename TR> void uRTCLib::eeprom_read(const unsigned int address, TR *data) {
-		eeprom_read(address, (uint8_t *) data, sizeof(TR));
+		eeprom_read(address, (byte *) data, sizeof(TR));
 	}
-
 #endif
 
 

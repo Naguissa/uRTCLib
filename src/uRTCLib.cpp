@@ -17,12 +17,6 @@
 #include "uRTCLib.h"
 
 
-///**
-// * Constructor
-// */
-//uRTCLib::uRTCLib() {
-//	//  refresh();
-//}
 
 /**
  * Constructor
@@ -31,7 +25,6 @@
  */
 uRTCLib::uRTCLib(const int rtc_address) {
 	_rtc_address = rtc_address;
-	//  refresh();
 }
 
 /**
@@ -43,31 +36,38 @@ uRTCLib::uRTCLib(const int rtc_address) {
 uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
 	_rtc_address = rtc_address;
 	_ee_address = ee_address;
-	//  refresh();
 }
 
 /**
  * Refresh data from HW RTC
  */
 void uRTCLib::refresh() {
+	uRTCLIB_YIELD
 	Wire.beginTransmission(_rtc_address);
 	Wire.write(0); // set DS3231 register pointer to 00h
 	Wire.endTransmission();
 	Wire.requestFrom(_rtc_address, 7);
 	// request seven uint8_ts of data starting from register 00h
 	_second = Wire.read();
+	uRTCLIB_YIELD
 	_second = uRTCLIB_bcdToDec(_second);
 	_minute = Wire.read();
+	uRTCLIB_YIELD
 	_minute = uRTCLIB_bcdToDec(_minute);
 	_hour = Wire.read() & 0b111111;
+	uRTCLIB_YIELD
 	_hour = uRTCLIB_bcdToDec(_hour);
 	_dayOfWeek = Wire.read();
+	uRTCLIB_YIELD
 	_dayOfWeek = uRTCLIB_bcdToDec(_dayOfWeek);
 	_day = Wire.read();
+	uRTCLIB_YIELD
 	_day = uRTCLIB_bcdToDec(_day);
 	_month = Wire.read();
+	uRTCLIB_YIELD
 	_month = uRTCLIB_bcdToDec(_month);
 	_year = Wire.read();
+	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
 }
 
@@ -157,6 +157,7 @@ void uRTCLib::set_rtc_address(const int addr) {
  * @param uint8_t year year to set to HW RTC
  */
 void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
+	uRTCLIB_YIELD
 	Wire.beginTransmission(_rtc_address);
 	Wire.write(0); // set next input to start at the seconds register
 	Wire.write(uRTCLIB_decToBcd(second)); // set seconds
@@ -167,6 +168,7 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 	Wire.write(uRTCLIB_decToBcd(month)); // set month
 	Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
 	Wire.endTransmission();
+	uRTCLIB_YIELD
 }
 
 
@@ -190,17 +192,20 @@ void uRTCLib::set_ee_address(const uint8_t addr) {
  * @param unsigned int address Address inside EEPROM to read from
  * @return char read byte
  */
-uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
-	uint8_t rdata = 0xFF;
+byte uRTCLib::_eeprom_read(const unsigned int address) {
+	uRTCLIB_STM32_INIT_FIX()
+	uRTCLIB_YIELD
+	byte rdata = 0xFF;
 	Wire.beginTransmission(_ee_address);
 	Wire.write((int)(address >> 8)); // MSB
 	Wire.write((int)(address & 0xFF)); // LSB
 	if (Wire.endTransmission()==0) {
 		Wire.requestFrom(_ee_address, 1);
-		if (Wire.available()) {
-			rdata = (uint8_t) Wire.read();
+		if(Wire.available()) {
+			rdata = (byte) Wire.read();
 		}
-	}
+	}	
+	uRTCLIB_YIELD
 	return rdata;
 }
 
@@ -208,30 +213,16 @@ uint8_t uRTCLib::_eeprom_read(const unsigned int address) {
  * Read sequence of n bytes. Optionally from offset
  *
  * @param unsigned int address Address inside EEPROM to read from
- * @param byte* data Pinter to where read data to
+ * @param byte* data Pointer to where read data to
  * @param uint8_t n number of bytes to read
- * @return char read byte
  */
-void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8_t n) {
-	for (uint8_t i = 0; i < n; i++) {
-		*(data + i) = _eeprom_read(address + i);
+void uRTCLib::eeprom_read(const unsigned int address, byte *data, const uint8_t n) {
+	unsigned int i;
+	for (i = 0; i < n; i++) {
+ 		byte step = _eeprom_read(address + i);
+ 		*(data + n - i - 1) = step;
 	}
 }
-
-
-/**
- * Read sequence of n bytes. Optionally from offset
- *
- * @param unsigned int address Address inside EEPROM to read from
- * @param byte* data Pinter to where read data to
- * @param uint8_t n number of bytes to read
- * @param uint8_t offset offset where address start read from
- * @return char read byte
- */
-void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8_t n, const uint8_t offset) {
-	eeprom_read(address, data + offset, n);
-}
-
 
 
 /**
@@ -240,7 +231,7 @@ void uRTCLib::eeprom_read(const unsigned int address, uint8_t *data, const uint8
  * @param unsigned int address Address inside EEPROM to read from
  * @return byte read data
  */
-uint8_t uRTCLib::eeprom_read(const unsigned int address) {
+byte uRTCLib::eeprom_read(const unsigned int address) {
 	return _eeprom_read(address);
 }
 
@@ -248,15 +239,17 @@ uint8_t uRTCLib::eeprom_read(const unsigned int address) {
  * Write one byte to EEPROM
  *
  * @param unsigned int address Address inside EEPROM to write to
- * @param uint8_t data byte to write
+ * @param byte data byte to write
  * @return bool true if successful
  */
-bool uRTCLib::_eeprom_write(const unsigned int address, const uint8_t data) {
+bool uRTCLib::_eeprom_write(const unsigned int address, const byte data) {
+	uRTCLIB_YIELD
 	Wire.beginTransmission(_ee_address);
 	Wire.write((int)(address >> 8)); // MSB
 	Wire.write((int)(address & 0xFF)); // LSB
 	Wire.write(data);
-	delay(5); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
+	uRTCLIB_YIELD
+	delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
 	return Wire.endTransmission() == 0;
 }
 
@@ -265,43 +258,43 @@ bool uRTCLib::_eeprom_write(const unsigned int address, const uint8_t data) {
  * Write sequence of n bytes
  *
  * @param address uint initial addesss to write to
- * @param data *uint8_t pointer to data to write (without offset)
+ * @param data *byte pointer to data to write (without offset)
  * @param n uint8_t number of bytes to write
  * @return bool true if successful
  */
-bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t *data, const uint8_t n) {
+bool uRTCLib::eeprom_write(const unsigned int address, void *data, const uint8_t n) {
 	bool r = true;
-	for (uint8_t  i = 0; i < n; i++) {
-		r &= _eeprom_write(address + i, (uint8_t) *(data + i));
-		if (!r) {
-			return false;
-		}
+	uint8_t i;
+	for (i = 0; i < n; i++) {
+		r &= _eeprom_write(address + i, (byte) (((*((uint32_t*) data)) >> ((n - i - 1)*8) & 0xFF)));
 	}
 	return r;
 }
 
 
 /**
- * Write sequence of n bytes from offset
+ * Write one byte to EEPROM address
  *
- * @param address uint initial addesss to write to
- * @param data *uint8_t pointer to data to write (without offset)
- * @param n uint8_t number of bytes to write
- * @param offset uint8_t Offset from address to write to
- * @return bool true if successful
- */
-bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t *data, const uint8_t n, const uint8_t offset) {
-	return eeprom_write(address + offset, data, n);
-}
-
-/**
- * Write one bytes
+ * Template specialization come to cpp file instead h file
  *
- * @param address uint initial addesss to write to
- * @param data uint8_t data to write
- * @return bool true if successful
+ * @param unsigned int address Address inside EEPROM to write to
+ * @param data char data to write
  */
-bool uRTCLib::eeprom_write(const unsigned int address, const uint8_t data) {
+bool uRTCLib::eeprom_write(const unsigned int address, char data) {
 	return _eeprom_write(address, data);
 }
+
+
+/**
+ * Write one byte to EEPROM address
+ *
+ * Template specialization come to cpp file instead h file
+ *
+ * @param unsigned int address Address inside EEPROM to write to
+ * @param data unsigned char data to write
+ */
+bool uRTCLib::eeprom_write(const unsigned int address, unsigned char data) {
+	return _eeprom_write(address, data);
+}
+
 

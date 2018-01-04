@@ -20,19 +20,31 @@ delay (2000);
 	Wire.begin();
 
 
-	int inttmp = 32101;
-	float floattmp = 3.14159;
+	#ifdef _VARIANT_ARDUINO_STM32_
+		Serial.println("Board: STM32");
+	#else
+		Serial.println("Board: Other");
+	#endif
+
+	int inttmp = 24543557;
+	float floattmp = 3.1416;
 	char chartmp = 'A';
 
 	// Testing template
 	if (!rtc.eeprom_write(0, inttmp)) {
 		Serial.println("Failed to store INT");
+	} else {
+		Serial.println("INT correctly stored");
 	}
 	if (!rtc.eeprom_write(4, floattmp)) {
 		Serial.println("Failed to store FLOAT");
+	} else {
+		Serial.println("FLOAT correctly stored");
 	}
 	if (!rtc.eeprom_write(8, chartmp)) {
 		Serial.println("Failed to store CHAR");
+	} else {
+		Serial.println("CHAR correctly stored");
 	}
 
 	rtc.set(0, 42, 16, 6, 2, 5, 15);
@@ -44,26 +56,21 @@ delay (2000);
 	chartmp = 0;
 
 
-	#ifdef _VARIANT_ARDUINO_STM32_
-		Serial.println("Board: STM32");
-	#else
-		Serial.println("Board: Other");
-	#endif
 
 	Serial.print("int: ");
 	rtc.eeprom_read(0, &inttmp);
-	Serial.print(inttmp);
-	Serial.print("; float: ");
+	Serial.println(inttmp);
+	Serial.print("float: ");
 	rtc.eeprom_read(4, &floattmp);
-	Serial.print(floattmp);
-	Serial.print("; char: ");
+	Serial.println((float) floattmp);
+	Serial.print("char: ");
 	rtc.eeprom_read(8, &chartmp);
-	Serial.print(chartmp);
+	Serial.println(chartmp);
 	Serial.println();
 
 
 	for(pos = 9; pos < 1000; pos++) {
-		rtc.eeprom_write(pos, (unsigned char) pos % 256);
+		rtc.eeprom_write(pos, (unsigned char) (pos % 256));
 	}
 
 	pos = 0;
