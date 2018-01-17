@@ -16,6 +16,15 @@
 #include <Wire.h>
 #include "uRTCLib.h"
 
+/**
+ * Constructor
+ *
+ * @param bool skipInit Set true to skip Wire.init (needed for STM32, SAM and Arduino, at least)
+ */
+uRTCLib::uRTCLib(bool skipInit) {
+	init = skipInit;
+}
+
 
 
 /**
@@ -34,6 +43,30 @@ uRTCLib::uRTCLib(const int rtc_address) {
  * @param int ee_address I2C address of EEPROM
  */
 uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
+	_rtc_address = rtc_address;
+	_ee_address = ee_address;
+}
+
+/**
+ * Constructor
+ *
+ * @param bool skipInit Set true to skip Wire.init (needed for STM32, SAM and Arduino, at least)
+ * @param int rtc_address I2C address of RTC
+ */
+uRTCLib::uRTCLib(bool skipInit, const int rtc_address) {
+	init = skipInit;
+	_rtc_address = rtc_address;
+}
+
+/**
+ * Constructor
+ *
+ * @param bool skipInit Set true to skip Wire.init (needed for STM32, SAM and Arduino, at least)
+ * @param int rtc_address I2C address of RTC
+ * @param int ee_address I2C address of EEPROM
+ */
+uRTCLib::uRTCLib(bool skipInit, const int rtc_address, const int ee_address) {
+	init = skipInit;
 	_rtc_address = rtc_address;
 	_ee_address = ee_address;
 }

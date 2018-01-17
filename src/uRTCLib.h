@@ -48,6 +48,9 @@
 			uRTCLib();
 			uRTCLib(const int);
 			uRTCLib(const int, const int);
+			uRTCLib(bool);
+			uRTCLib(bool, const int);
+			uRTCLib(bool, const int, const int);
 			// RTC functions
 			void refresh();
 			uint8_t second();
@@ -85,16 +88,9 @@
 			// EEPROM read and write private functions - works with bytes
 			byte _eeprom_read(const unsigned int);
 			bool _eeprom_write(const unsigned int, const byte);
-	// Fix for STM32 1st write error
-	#ifdef _VARIANT_ARDUINO_STM32_
-		bool init = false;
-		#define uRTCLIB_STM32_INIT_FIX() { if (!init) { init = true;  _eeprom_read(0); delay(10); } }
-	#elif ARDUINO_ARCH_SAM
-		bool init = false;
-		#define uRTCLIB_STM32_INIT_FIX() { if (!init) { init = true;  _eeprom_read(0); delay(10); } }
-	#else
-		#define uRTCLIB_STM32_INIT_FIX()
-	#endif
+			// Fix for 1st write error
+			bool init = false;
+			#define uRTCLIB_STM32_INIT_FIX() { if (!init) { init = true;  _eeprom_read(0); delay(10); } }
 	};
 
 

@@ -25,8 +25,12 @@ delay (2000);
 	#else
 		Serial.println("Board: Other");
 	#endif
-
+#ifdef ARDUINO_ARCH_AVR
+	int inttmp = 32123;
+#else
+	// too logng for AVR 16 bits!
 	int inttmp = 24543557;
+#endif
 	float floattmp = 3.1416;
 	char chartmp = 'A';
 
