@@ -16,8 +16,11 @@ delay (2000);
 	Serial.println("Serial OK");
 	//  Max position: 32767
 
-	// Wire.begin(0, 2); // D3 and D4 on ESP8266
-	Wire.begin();
+	#ifdef ARDUINO_ARCH_ESP8266
+		Wire.begin(0, 2); // D3 and D4 on ESP8266
+	#else
+		Wire.begin();
+	#endif
 
 
 	#ifdef _VARIANT_ARDUINO_STM32_
