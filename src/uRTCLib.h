@@ -89,6 +89,9 @@
 	#ifdef _VARIANT_ARDUINO_STM32_
 		bool init = false;
 		#define uRTCLIB_STM32_INIT_FIX() { if (!init) { init = true;  _eeprom_read(0); delay(10); } }
+	#elif ARDUINO_ARCH_SAM
+		bool init = false;
+		#define uRTCLIB_STM32_INIT_FIX() { if (!init) { init = true;  _eeprom_read(0); delay(10); } }
 	#else
 		#define uRTCLIB_STM32_INIT_FIX()
 	#endif
