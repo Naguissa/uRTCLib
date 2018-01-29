@@ -60,6 +60,7 @@
 			uint8_t month();
 			uint8_t year();
 			uint8_t dayOfWeek();
+			uint8_t temp3231();
 			void set_rtc_address(const int);
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			// EEPROM
@@ -85,6 +86,7 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
+			uint8_t _temp3231 = 0;
 			// EEPROM read and write private functions - works with bytes
 			byte _eeprom_read(const unsigned int);
 			bool _eeprom_write(const unsigned int, const byte);

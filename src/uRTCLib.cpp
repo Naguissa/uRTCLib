@@ -102,6 +102,31 @@ void uRTCLib::refresh() {
 	_year = Wire.read();
 	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
+	
+	 byte tMSB, tLSB; 
+     // temp registers (11h-12h) get updated automatically every 64s
+     Wire.beginTransmission(_rtc_address);
+     Wire.write(0x11);
+     Wire.endTransmission();
+     Wire.requestFrom(_rtc_address, 2);
+
+     // Should I do more "if available" checks here?
+    if(Wire.available()) {
+    tMSB = Wire.read(); //2's complement int portion
+    tLSB = Wire.read(); //fraction portion
+
+    _temp3231 = ((((short)tMSB << 8) | (short)tLSB) >> 6) / 4.0;
+    }
+    else {
+    _temp3231 = 9999; // Some obvious error value
+    }
+ 
+	
+	
+}
+uint8_t uRTCLib::temp3231() {
+   
+  return _temp3231;
 }
 
 /**
