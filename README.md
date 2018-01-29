@@ -8,8 +8,12 @@ DS1307 and DS3231 RTCs are supported
 
 AT24C32 EEPROM supported
 
+Also, added support for DS3231 temperature sensor.
+
 
 (and compatibles)
+
+
 
 
 ## How do I get set up? ##
@@ -22,9 +26,12 @@ For manual installation:
  * Rename to uRTCLib.zip
  * Install library on Arduino
 
+
+
 ## Example ##
 
 Included on example folder, available on Arduino IDE.
+
 
 
 

@@ -3,7 +3,7 @@
  *
  * Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino.
  *
- * DS1307 and DS3231 RTCs are supported AT24C32 EEPROM supported (and compatibles)
+ * DS1307 and DS3231 RTCs are supported AT24C32 EEPROM supported (and compatibles). Also temperature sensor is supported for DS3231.
  *
  *
  * @copyright Naguissa
@@ -36,11 +36,11 @@
 	#else
 		#define uRTCLIB_YIELD
 	#endif
-	
+
 	// Wire delay
 	#define uRTCLIB_WIRE_DELAY 5
-	
-	
+
+
 
 	class uRTCLib {
 		public:
@@ -60,7 +60,7 @@
 			uint8_t month();
 			uint8_t year();
 			uint8_t dayOfWeek();
-			uint8_t temp3231();
+			float temp();
 			void set_rtc_address(const int);
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			// EEPROM
@@ -86,7 +86,7 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
-			uint8_t _temp3231 = 0;
+			float _temp = 9999;
 			// EEPROM read and write private functions - works with bytes
 			byte _eeprom_read(const unsigned int);
 			bool _eeprom_write(const unsigned int, const byte);

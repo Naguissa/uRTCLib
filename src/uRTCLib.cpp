@@ -3,7 +3,7 @@
  *
  * Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino.
  *
- * DS1307 and DS3231 RTCs are supported AT24C32 EEPROM supported (and compatibles)
+ * DS1307 and DS3231 RTCs are supported AT24C32 EEPROM supported (and compatibles). Also temperature sensor is supported for DS3231.
  *
  *
  * @copyright Naguissa
@@ -102,8 +102,8 @@ void uRTCLib::refresh() {
 	_year = Wire.read();
 	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
-	
-	 byte tMSB, tLSB; 
+
+	 byte tMSB, tLSB;
      // temp registers (11h-12h) get updated automatically every 64s
      Wire.beginTransmission(_rtc_address);
      Wire.write(0x11);
@@ -112,21 +112,29 @@ void uRTCLib::refresh() {
 
      // Should I do more "if available" checks here?
     if(Wire.available()) {
-    tMSB = Wire.read(); //2's complement int portion
-    tLSB = Wire.read(); //fraction portion
-
-    _temp3231 = ((((short)tMSB << 8) | (short)tLSB) >> 6) / 4.0;
+		tMSB = Wire.read(); //2's complement int portion
+		tLSB = Wire.read(); //fraction portion
+		_temp = ((((short)tMSB << 8) | (short)tLSB) >> 6) / 4.0;
     }
     else {
-    _temp3231 = 9999; // Some obvious error value
+		_temp = 9999; // Some obvious error value
     }
- 
-	
-	
+
+
+
 }
-uint8_t uRTCLib::temp3231() {
-   
-  return _temp3231;
+
+
+/**
+ * Returns actual temperature
+ *
+ * WARNING: Currently only DS3231 is known to have it at a known address
+ *
+ * @return float Current stored temperature
+ */
+float uRTCLib::temp() {
+
+  return _temp;
 }
 
 /**
@@ -262,7 +270,7 @@ byte uRTCLib::_eeprom_read(const unsigned int address) {
 		if(Wire.available()) {
 			rdata = (byte) Wire.read();
 		}
-	}	
+	}
 	uRTCLIB_YIELD
 	return rdata;
 }

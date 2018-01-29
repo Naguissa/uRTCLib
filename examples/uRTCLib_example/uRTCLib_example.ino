@@ -85,26 +85,35 @@ delay (2000);
 
 void loop() {
 	rtc.refresh();
+
 	Serial.print("RTC DateTime: ");
 	Serial.print(rtc.year());
 	Serial.print('/');
 	Serial.print(rtc.month());
 	Serial.print('/');
 	Serial.print(rtc.day());
+
 	Serial.print(' ');
+
 	Serial.print(rtc.hour());
 	Serial.print(':');
 	Serial.print(rtc.minute());
 	Serial.print(':');
 	Serial.print(rtc.second());
+
 	Serial.print(" DOW: ");
 	Serial.print(rtc.dayOfWeek());
+
+	Serial.print(" - Temp: ");
+	Serial.print(rtc.temp());
+
 	Serial.print(" ---- ");
 	Serial.print(pos);
 	Serial.print(": ");
 	Serial.print(rtc.eeprom_read(pos));
 
 	Serial.println();
+
 	pos++;
 	pos %= 1000;
 	delay(1000);
