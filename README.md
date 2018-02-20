@@ -38,5 +38,5 @@ Included on example folder, available on Arduino IDE.
 ## Who do I talk to? ##
 
  * [Naguissa](https://github.com/Naguissa)
+ * https://www.foroelectro.net/electronica-digital-microcontroladores-f8/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * https://www.naguissa.com
- * https://www.foroelectro.net
