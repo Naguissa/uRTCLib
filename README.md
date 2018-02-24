@@ -1,21 +1,29 @@
-# Arduino, ESP8266 and STM32 uMFMLib
+# Arduino, ESP8266 and STM32 uRTCLib
 
 ## What is this repository for? ##
 
-Tiny lib to enode and decode FM and MFM data streams.
+Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino, ESP8266 and STM32 microcontrollers.
 
-Also provides a method to check for SYNC bit stream.
+DS1307 and DS3231 RTCs are supported
 
-A default it starts with MFM encoding and 0 as initial (previous) bit.
+AT24C32 EEPROM supported
+
+Also, added support for DS3231 temperature sensor.
+
+
+(and compatibles)
+
+
+
 
 ## How do I get set up? ##
 
-You can get it from Arduino libraries directly, searching by uMFMLib.
+You can get it from Arduino libraries directly, searching by uRTCLib.
 
 For manual installation:
 
  * Get the ZIP.
- * Rename to uMFMLib.zip
+ * Rename to uRTCLib.zip
  * Install library on Arduino
 
 
@@ -30,5 +38,5 @@ Included on example folder, available on Arduino IDE.
 ## Who do I talk to? ##
 
  * [Naguissa](https://github.com/Naguissa)
- * https://www.foroelectro.net
+ * https://www.foroelectro.net/electronica-digital-microcontroladores-f8/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * https://www.naguissa.com
