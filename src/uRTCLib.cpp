@@ -18,6 +18,12 @@
 
 /**
  * Constructor
+ */
+uRTCLib::uRTCLib() { }
+
+
+/**
+ * Constructor
  *
  * @param bool skipInit Set true to skip Wire.init (needed for STM32, SAM and Arduino, at least)
  */
@@ -265,10 +271,13 @@ byte uRTCLib::_eeprom_read(const unsigned int address) {
 	Wire.beginTransmission(_ee_address);
 	Wire.write((int)(address >> 8)); // MSB
 	Wire.write((int)(address & 0xFF)); // LSB
+    delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
 	if (Wire.endTransmission()==0) {
 		Wire.requestFrom(_ee_address, 1);
+        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
 		if(Wire.available()) {
 			rdata = (byte) Wire.read();
+            delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
 		}
 	}
 	uRTCLIB_YIELD
