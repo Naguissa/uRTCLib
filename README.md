@@ -2,7 +2,7 @@
 
 ## What is this repository for? ##
 
-Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino, ESP8266 and STM32 microcontrollers.
+Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino, ESP8266, STM32, ESP32 and other microcontrollers.
 
 DS1307 and DS3231 RTCs are supported
 
@@ -38,5 +38,11 @@ Included on example folder, available on Arduino IDE.
 ## Who do I talk to? ##
 
  * [Naguissa](https://github.com/Naguissa)
- * https://www.foroelectro.net/electronica-digital-microcontroladores-f8/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
+ * https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * https://www.naguissa.com
+
+## Support ##
+
+You can make a donation via PayPal: https://paypal.me/foroelectro
+
+Thanks for your support.
