@@ -66,7 +66,7 @@
 			// EEPROM
 			void set_ee_address(const uint8_t);
 			// EEPROM read functions
-			void eeprom_read(const unsigned int, byte *, const uint8_t);
+			bool eeprom_read(const unsigned int, byte *, const uint8_t);
 			template <typename TR> void eeprom_read(const unsigned int, TR *);
 			byte eeprom_read(const unsigned int);
 			// EEPROM write functions

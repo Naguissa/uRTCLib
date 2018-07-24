@@ -272,7 +272,7 @@ byte uRTCLib::_eeprom_read(const unsigned int address) {
 	Wire.write((int)(address >> 8)); // MSB
 	Wire.write((int)(address & 0xFF)); // LSB
     delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-	if (Wire.endTransmission()==0) {
+	if (Wire.endTransmission() == 0) {
 		Wire.requestFrom(_ee_address, 1);
         delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
 		if(Wire.available()) {
@@ -290,13 +290,36 @@ byte uRTCLib::_eeprom_read(const unsigned int address) {
  * @param unsigned int address Address inside EEPROM to read from
  * @param byte* data Pointer to where read data to
  * @param uint8_t n number of bytes to read
+ * @return  Bool    true if bytes read are the same as requested
  */
-void uRTCLib::eeprom_read(const unsigned int address, byte *data, const uint8_t n) {
-	unsigned int i;
-	for (i = 0; i < n; i++) {
- 		byte step = _eeprom_read(address + i);
- 		*(data + n - i - 1) = step;
+bool uRTCLib::eeprom_read(const unsigned int address, byte *data, const uint8_t n) {
+    bool ret = false;
+	uRTCLIB_STM32_INIT_FIX()
+	uRTCLIB_YIELD
+	Wire.beginTransmission(_ee_address);
+	Wire.write((int)(address >> 8)); // MSB
+	Wire.write((int)(address & 0xFF)); // LSB
+    delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
+	if (Wire.endTransmission() == 0) {
+		Wire.requestFrom(_ee_address, (int) n);
+        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
+		if(Wire.available()) {
+			byte i = 0, j;
+            for (; i < n && Wire.available(); i++) {
+                *(data + i) = (byte) Wire.read();
+ 		        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
+            	uRTCLIB_YIELD
+				// Added to wait if needed but cut after a failure (timeout)
+            	for (j = 0; j < 255 && !Wire.available(); j++) {
+	 		        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
+		        	uRTCLIB_YIELD
+				}
+            }
+            ret = (i == n);
+		}
 	}
+	uRTCLIB_YIELD
+	return ret;
 }
 
 
@@ -341,8 +364,9 @@ bool uRTCLib::eeprom_write(const unsigned int address, void *data, const uint8_t
 	bool r = true;
 	uint8_t i;
 	for (i = 0; i < n; i++) {
-		r &= _eeprom_write(address + i, (byte) (((*((uint32_t*) data)) >> ((n - i - 1)*8) & 0xFF)));
+		r &= _eeprom_write(address + i, (byte) *(((byte *) data) + i));
 	}
+Serial.println();
 	return r;
 }
 
