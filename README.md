@@ -1,4 +1,4 @@
-# Arduino, ESP8266 and STM32 uRTCLib
+# Arduino, ESP8266, STM32, ESP32 and others uRTCLib
 
 ## What is this repository for? ##
 
