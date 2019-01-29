@@ -366,7 +366,6 @@ bool uRTCLib::eeprom_write(const unsigned int address, void *data, const uint8_t
 	for (i = 0; i < n; i++) {
 		r &= _eeprom_write(address + i, (byte) *(((byte *) data) + i));
 	}
-Serial.println();
 	return r;
 }
 
