@@ -2,11 +2,11 @@
 
 ## What is this repository for? ##
 
-Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino, ESP8266, STM32, ESP32 and other microcontrollers.
+Really tiny library to basic RTC functionality on Arduino, ESP8266, STM32, ESP32 and other microcontrollers.
 
 DS1307 and DS3231 RTCs are supported
 
-AT24C32 EEPROM supported
+EEPROM support has been moved to https://github.com/Naguissa/uEEPROMLib
 
 Also, added support for DS3231 temperature sensor.
 
@@ -41,8 +41,14 @@ Included on example folder, available on Arduino IDE.
  * https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * https://www.naguissa.com
 
-## Support ##
+
+
+## Contribute ##
+
+Any code contribution, report or comment are always welcome. Don't hesitate to use GitHub for that.
+
 
 You can make a donation via PayPal: https://paypal.me/foroelectro
+
 
 Thanks for your support.

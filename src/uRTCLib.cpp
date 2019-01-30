@@ -1,15 +1,17 @@
 /**
- * DS1307 and DS3231 RTCs with AT24C32 (and compatible) integrated EEPROM basic library
+ * DS1307 and DS3231 RTCs basic library
  *
- * Really tiny library to basic RTC and EEPROM (incorporated) functionality on Arduino.
+ * Really tiny library to basic RTC functionality on Arduino.
  *
- * DS1307 and DS3231 RTCs are supported AT24C32 EEPROM supported (and compatibles). Also temperature sensor is supported for DS3231.
+ * DS1307 and DS3231 RTCs are supported. See uEEPROMLib for EEPROM support. Also temperature sensor is supported for DS3231.
  *
  *
  * @copyright Naguissa
  * @author Naguissa
+ * @url https://github.com/Naguissa/uRTCLib
+ * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa.com@gmail.com
- * @version 3.2.0
+ * @version 5.0.0
  * @created 2015-05-07
  */
 #include <Arduino.h>
@@ -27,9 +29,7 @@ uRTCLib::uRTCLib() { }
  *
  * @param bool skipInit Set true to skip Wire.init (needed for STM32, SAM and Arduino, at least)
  */
-uRTCLib::uRTCLib(bool skipInit) {
-	init = skipInit;
-}
+uRTCLib::uRTCLib(bool skipInit) { }
 
 
 
@@ -42,16 +42,6 @@ uRTCLib::uRTCLib(const int rtc_address) {
 	_rtc_address = rtc_address;
 }
 
-/**
- * Constructor
- *
- * @param int rtc_address I2C address of RTC
- * @param int ee_address I2C address of EEPROM
- */
-uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
-	_rtc_address = rtc_address;
-	_ee_address = ee_address;
-}
 
 /**
  * Constructor
@@ -60,21 +50,7 @@ uRTCLib::uRTCLib(const int rtc_address, const int ee_address) {
  * @param int rtc_address I2C address of RTC
  */
 uRTCLib::uRTCLib(bool skipInit, const int rtc_address) {
-	init = skipInit;
 	_rtc_address = rtc_address;
-}
-
-/**
- * Constructor
- *
- * @param bool skipInit Set true to skip Wire.init (needed for STM32, SAM and Arduino, at least)
- * @param int rtc_address I2C address of RTC
- * @param int ee_address I2C address of EEPROM
- */
-uRTCLib::uRTCLib(bool skipInit, const int rtc_address, const int ee_address) {
-	init = skipInit;
-	_rtc_address = rtc_address;
-	_ee_address = ee_address;
 }
 
 /**
@@ -244,155 +220,7 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 }
 
 
-/**
- * Sets RTC EEPROM i2 addres
- *
- * @param int addr RTC i2C address
- */
-void uRTCLib::set_ee_address(const uint8_t addr) {
-	_ee_address = addr;
-}
-
-
-/**********
- * EEPROM *
- **********/
 
 /**
- * Read one byte
- *
- * @param unsigned int address Address inside EEPROM to read from
- * @return char read byte
+ * EEPROM functionality has been moved to separate library: https://github.com/Naguissa/uEEPROMLib
  */
-byte uRTCLib::_eeprom_read(const unsigned int address) {
-	uRTCLIB_STM32_INIT_FIX()
-	uRTCLIB_YIELD
-	byte rdata = 0xFF;
-	Wire.beginTransmission(_ee_address);
-	Wire.write((int)(address >> 8)); // MSB
-	Wire.write((int)(address & 0xFF)); // LSB
-    delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-	if (Wire.endTransmission() == 0) {
-		Wire.requestFrom(_ee_address, 1);
-        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-		if(Wire.available()) {
-			rdata = (byte) Wire.read();
-            delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-		}
-	}
-	uRTCLIB_YIELD
-	return rdata;
-}
-
-/**
- * Read sequence of n bytes. Optionally from offset
- *
- * @param unsigned int address Address inside EEPROM to read from
- * @param byte* data Pointer to where read data to
- * @param uint8_t n number of bytes to read
- * @return  Bool    true if bytes read are the same as requested
- */
-bool uRTCLib::eeprom_read(const unsigned int address, byte *data, const uint8_t n) {
-    bool ret = false;
-	uRTCLIB_STM32_INIT_FIX()
-	uRTCLIB_YIELD
-	Wire.beginTransmission(_ee_address);
-	Wire.write((int)(address >> 8)); // MSB
-	Wire.write((int)(address & 0xFF)); // LSB
-    delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-	if (Wire.endTransmission() == 0) {
-		Wire.requestFrom(_ee_address, (int) n);
-        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-		if(Wire.available()) {
-			byte i = 0, j;
-            for (; i < n && Wire.available(); i++) {
-                *(data + i) = (byte) Wire.read();
- 		        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-            	uRTCLIB_YIELD
-				// Added to wait if needed but cut after a failure (timeout)
-            	for (j = 0; j < 255 && !Wire.available(); j++) {
-	 		        delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-		        	uRTCLIB_YIELD
-				}
-            }
-            ret = (i == n);
-		}
-	}
-	uRTCLIB_YIELD
-	return ret;
-}
-
-
-/**
- * Read a byte from EEPROM address
- *
- * @param unsigned int address Address inside EEPROM to read from
- * @return byte read data
- */
-byte uRTCLib::eeprom_read(const unsigned int address) {
-	return _eeprom_read(address);
-}
-
-/**
- * Write one byte to EEPROM
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param byte data byte to write
- * @return bool true if successful
- */
-bool uRTCLib::_eeprom_write(const unsigned int address, const byte data) {
-	uRTCLIB_YIELD
-	Wire.beginTransmission(_ee_address);
-	Wire.write((int)(address >> 8)); // MSB
-	Wire.write((int)(address & 0xFF)); // LSB
-	Wire.write(data);
-	uRTCLIB_YIELD
-	delay(uRTCLIB_WIRE_DELAY); // Little delay to assure EEPROM is able to process data; if missing and inside for look meses some values
-	return Wire.endTransmission() == 0;
-}
-
-
-/**
- * Write sequence of n bytes
- *
- * @param address uint initial addesss to write to
- * @param data *byte pointer to data to write (without offset)
- * @param n uint8_t number of bytes to write
- * @return bool true if successful
- */
-bool uRTCLib::eeprom_write(const unsigned int address, void *data, const uint8_t n) {
-	bool r = true;
-	uint8_t i;
-	for (i = 0; i < n; i++) {
-		r &= _eeprom_write(address + i, (byte) *(((byte *) data) + i));
-	}
-	return r;
-}
-
-
-/**
- * Write one byte to EEPROM address
- *
- * Template specialization come to cpp file instead h file
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param data char data to write
- */
-bool uRTCLib::eeprom_write(const unsigned int address, char data) {
-	return _eeprom_write(address, data);
-}
-
-
-/**
- * Write one byte to EEPROM address
- *
- * Template specialization come to cpp file instead h file
- *
- * @param unsigned int address Address inside EEPROM to write to
- * @param data unsigned char data to write
- */
-bool uRTCLib::eeprom_write(const unsigned int address, unsigned char data) {
-	return _eeprom_write(address, data);
-}
-
-

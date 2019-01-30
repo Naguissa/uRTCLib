@@ -1,3 +1,19 @@
+/**
+ * DS1307 and DS3231 RTCs basic library
+ *
+ * Really tiny library to basic RTC functionality on Arduino.
+ *
+ * DS1307 and DS3231 RTCs are supported. See uEEPROMLib for EEPROM support. Also temperature sensor is supported for DS3231.
+ *
+ *
+ * @copyright Naguissa
+ * @author Naguissa
+ * @url https://github.com/Naguissa/uRTCLib
+ * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
+ * @email naguissa.com@gmail.com
+ * @version 5.0.0
+ * @created 2015-05-07
+ */
 #include "Arduino.h"
 #include "Wire.h"
 #include "uRTCLib.h"
@@ -6,34 +22,23 @@
 uRTCLib rtc;
 
 
-unsigned int pos;
-
 void setup() {
 delay (2000);
 	Serial.begin(9600);
 	Serial.println("Serial OK");
 	//  Max position: 32767
 
-	// Wire.begin(0, 2); // D3 and D4 on ESP8266
-	Wire.begin();
-
-	for(pos = 0; pos < 1000; pos++) {
-		rtc.eeprom_write(pos, (unsigned char) pos % 256);
-	}
+	#ifdef ARDUINO_ARCH_ESP8266
+		Wire.begin(0, 2); // D3 and D4 on ESP8266
+	#else
+		Wire.begin();
+	#endif
 
 	// Only used once, then disabled
 	//  rtc.set(0, 42, 16, 6, 2, 5, 15);
 	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
 
-	pos = 0;
-
-	#ifdef _VARIANT_ARDUINO_STM32_
-	Serial.println("Board: STM32");
-	#else
-	Serial.println("Board: Other");
-	#endif
 	rtc.set_rtc_address(0x68);
-	rtc.set_ee_address(0x57);
 }
 
 void loop() {
@@ -60,13 +65,7 @@ void loop() {
 	Serial.print(" - Temp: ");
 	Serial.print(rtc.temp());
 
-	Serial.print(" ---- ");
-	Serial.print(pos);
-	Serial.print(": ");
-	Serial.print(rtc.eeprom_read(pos));
-
 	Serial.println();
-	pos++;
-	pos %= 1000;
+
 	delay(1000);
 }
