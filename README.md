@@ -46,7 +46,7 @@ Included on example folder, available on Arduino IDE.
 ## Who do I talk to? ##
 
  * [Naguissa](https://github.com/Naguissa)
- * https://www.foroelectro.net/librerias-arduino-ide-f29/ucrc16lib-pequena-libreria-para-calcular-el-ccitt--t214.html
+ * https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * https://www.naguissa.com
 
 
