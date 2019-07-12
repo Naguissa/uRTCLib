@@ -17,7 +17,7 @@
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa.com@gmail.com
- * @version 6.0.0
+ * @version 6.0.1
  * @created 2015-05-07
  */
 #ifndef URTCLIB
