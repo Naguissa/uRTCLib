@@ -387,7 +387,7 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 		Wire.endTransmission();
 		uRTCLIB_YIELD
 		Wire.requestFrom(_rtc_address, 1);
-		Wire.read();
+		status = Wire.read();
 		status &= 0b11111110;
 		Wire.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
