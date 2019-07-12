@@ -1,3 +1,4 @@
 Naguissa - https://github.com/Naguissa
 hyperion11 - https://github.com/hyperion11 - Multibyte EEPROM read/write
 SergDesher - https://github.com/sergdesher - DS3231 temperature sensor reading
+ArminJo - https://github.com/ArminJo - Alarm1 off status fix
