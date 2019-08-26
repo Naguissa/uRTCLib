@@ -111,6 +111,7 @@
 
 			// RTC functions
 			void refresh();
+			bool lostPower();
 			uint8_t second();
 			uint8_t minute();
 			uint8_t hour();
