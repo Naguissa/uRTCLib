@@ -16,8 +16,8 @@
  * @author Naguissa
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
- * @email naguissa.com@gmail.com
- * @version 6.0.1
+ * @email naguissa@foroelectro.net
+ * @version 6.1.0
  * @created 2015-05-07
  */
 #ifndef URTCLIB
@@ -111,7 +111,6 @@
 
 			// RTC functions
 			void refresh();
-			bool lostPower();
 			uint8_t second();
 			uint8_t minute();
 			uint8_t hour();
@@ -121,6 +120,8 @@
 			uint8_t dayOfWeek();
 			float temp();
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
+			bool lostPower();
+			void lostPowerClear();
 
 			void set_rtc_address(const int);
 			void set_model(const uint8_t);

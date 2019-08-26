@@ -16,8 +16,8 @@
  * @author Naguissa
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
- * @email naguissa.com@gmail.com
- * @version 6.0.0
+ * @email naguissa@foroelectro.net
+ * @version 6.1.0
  * @created 2015-05-07
  */
 #include "Arduino.h"
@@ -46,6 +46,16 @@ delay (2000);
 	// Only used once, then disabled
 	rtc.set(0, 42, 16, 6, 2, 5, 15);
 	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
+
+	Serial.print("Lost power status: ");
+	if (rtc.lostPower()) {
+		Serial.print("POWER FAILED. Clearing flag...");
+		rtc.lostPowerClear();
+		Serial.println(" done.");
+	} else {
+		Serial.println("POWER OK");
+	}
+
 
 	Serial.println("Testing SQWG/INT output:");
 

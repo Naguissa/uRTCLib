@@ -16,8 +16,8 @@
  * @author Naguissa
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
- * @email naguissa.com@gmail.com
- * @version 6.0.1
+ * @email naguissa@foroelectro.net
+ * @version 6.1.0
  * @created 2015-05-07
  */
 #include <Arduino.h>
@@ -216,24 +216,74 @@ void uRTCLib::refresh() {
 			break;
 	}
 }
+
 /**
  * Returns lost power VBAT staus
  *
- * WARNING: Currently only DS3231 is known to have it at a known address
+ * WARNING: DS1307 is known to not have it at a known address
  *
  * @return bool
  */
 bool uRTCLib::lostPower() {
-	
-	uRTCLIB_YIELD
-	Wire.beginTransmission(_rtc_address);
-	Wire.write(0X0F); 
-	Wire.endTransmission();
-	uRTCLIB_YIELD
-	Wire.requestFrom(_rtc_address, 1);
-	byte  _status = Wire.read();
-	return ((_status & 0x80) == 0x80);//(_status>>7); //checking if OSF is LH; (OSFxxxxxxx & 10000000) --> 80 (STOP) or 00 (RUN)
-  
+
+
+	switch (_model) {
+		case URTCLIB_MODEL_DS1307:
+			return false;
+			break;
+
+		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
+		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
+		default:
+			uRTCLIB_YIELD
+			Wire.beginTransmission(_rtc_address);
+			Wire.write(0X0F);
+			Wire.endTransmission();
+			uRTCLIB_YIELD
+			Wire.requestFrom(_rtc_address, 1);
+			uint8_t status = Wire.read();
+			uRTCLIB_YIELD
+			return ((status & 0B10000000) == 0B10000000);
+			break;
+	}
+}
+
+/**
+ * Returns lost power VBAT staus
+ *
+ * WARNING: DS1307 is known to not have it at a known address
+ *
+ * @return bool
+ */
+void uRTCLib::lostPowerClear() {
+
+
+	switch (_model) {
+		case URTCLIB_MODEL_DS1307:
+			break;
+
+		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
+		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
+		default:
+			uRTCLIB_YIELD
+			Wire.beginTransmission(_rtc_address);
+			Wire.write(0X0F);
+			Wire.endTransmission();
+			uRTCLIB_YIELD
+			Wire.requestFrom(_rtc_address, 1);
+			uint8_t status = Wire.read();
+			status &= 0b01111111;
+			uRTCLIB_YIELD
+			Wire.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			Wire.write(0x0F);
+			uRTCLIB_YIELD
+			Wire.write(status);
+			uRTCLIB_YIELD
+			Wire.endTransmission();
+			uRTCLIB_YIELD
+			break;
+	}
 }
 
 /**
@@ -369,17 +419,19 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 	uRTCLIB_YIELD
 	//
 	Wire.beginTransmission(_rtc_address);
-	Wire.write(0X0F); 
+	Wire.write(0X0F);
 	Wire.endTransmission();
 	uRTCLIB_YIELD
+	/* flip OSF bit --> Disabled, use lostPowerClear instead.
 	Wire.requestFrom(_rtc_address, 1);
 	uint8_t statreg = Wire.read();
-	statreg &= ~0x80; // flip OSF bit
+	statreg &= ~0x80;
 	uRTCLIB_YIELD
 	Wire.beginTransmission(_rtc_address);
-	Wire.write(0X0F); 
+	Wire.write(0X0F);
 	Wire.write((byte)statreg);
 	Wire.endTransmission();
+	*/
 }
 
 
