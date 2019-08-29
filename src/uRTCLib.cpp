@@ -9,6 +9,7 @@
  *     * RAM for DS1307 and DS3232
  *     * temperature sensor for DS3231 and DS3232
  *     * Alarms (1 and 2) for DS3231 and DS3232
+ *     * Power failure check for DS3231 and DS3232
  *
  * See uEEPROMLib for EEPROM support.
  *
@@ -17,7 +18,7 @@
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa@foroelectro.net
- * @version 6.1.0
+ * @version 6.2.0
  * @created 2015-05-07
  */
 #include <Arduino.h>
@@ -210,7 +211,7 @@ void uRTCLib::refresh() {
 
 			MSB = Wire.read(); //2's complement int portion
 			LSB = Wire.read(); //fraction portion
-			_temp = ((((short)MSB << 8) | (short)LSB) >> 6) / 4.0;
+			_temp = ((((short)MSB << 8) | (short)LSB) >> 6) * 25;
 
 
 			break;
@@ -289,13 +290,13 @@ void uRTCLib::lostPowerClear() {
 /**
  * Returns actual temperature
  *
- * WARNING: Currently only DS3231 is known to have it at a known address
+ * WARNING: DS1307 has no temperature register, so it always returns URTCLIB_TEMP_ERROR
  *
- * @return float Current stored temperature
+ * @return int16_t Current stored temperature
  */
-float uRTCLib::temp() {
+int16_t uRTCLib::temp() {
 	if (_model == URTCLIB_MODEL_DS1307) {
-		return 9999;
+		return URTCLIB_TEMP_ERROR;
 	}
 	return _temp;
 }

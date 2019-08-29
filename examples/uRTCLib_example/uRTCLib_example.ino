@@ -9,6 +9,7 @@
  *     * RAM for DS1307 and DS3232
  *     * temperature sensor for DS3231 and DS3232
  *     * Alarms (1 and 2) for DS3231 and DS3232
+ *     * Power failure check for DS3231 and DS3232
  *
  * See uEEPROMLib for EEPROM support.
  *
@@ -17,7 +18,7 @@
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa@foroelectro.net
- * @version 6.1.0
+ * @version 6.2.0
  * @created 2015-05-07
  */
 #include "Arduino.h"
@@ -66,7 +67,7 @@ void loop() {
 	Serial.print(rtc.dayOfWeek());
 
 	Serial.print(" - Temp: ");
-	Serial.print(rtc.temp());
+	Serial.print(rtc.temp()  / 100);
 
 	Serial.println();
 

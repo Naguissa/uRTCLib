@@ -9,6 +9,7 @@
  *     * RAM for DS1307 and DS3232
  *     * temperature sensor for DS3231 and DS3232
  *     * Alarms (1 and 2) for DS3231 and DS3232
+ *     * Power failure check for DS3231 and DS3232
  *
  * See uEEPROMLib for EEPROM support.
  *
@@ -17,7 +18,7 @@
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa@foroelectro.net
- * @version 6.1.0
+ * @version 6.2.0
  * @created 2015-05-07
  */
 #ifndef URTCLIB
@@ -89,6 +90,10 @@
 	#define URTCLIB_SQWG_8192H 0b00011000   /* All */
 	#define URTCLIB_SQWG_32768H 0b00000011  /* DS1307 only */
 
+
+	#define URTCLIB_TEMP_ERROR 32767		/* 327.67º, obviously erroneous */
+
+
 	// Convert normal decimal numbers to binary coded decimal
 	#define uRTCLIB_decToBcd(val) ((uint8_t) ((val / 10 * 16) + (val % 10)))
 
@@ -118,7 +123,7 @@
 			uint8_t month();
 			uint8_t year();
 			uint8_t dayOfWeek();
-			float temp();
+			int16_t temp();
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			bool lostPower();
 			void lostPowerClear();
@@ -160,7 +165,7 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
-			float _temp = 9999;
+			int16_t _temp = 9999;
 
 			// Model, for alarms and RAM
 			uint8_t _model = URTCLIB_MODEL_DS3232;
