@@ -18,7 +18,7 @@
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa@foroelectro.net
- * @version 6.2.0
+ * @version 6.2.1
  * @created 2015-05-07
  */
 #include "Arduino.h"
@@ -127,7 +127,7 @@ void loop() {
 	Serial.print(rtc.dayOfWeek());
 
 	Serial.print(" - Temp: ");
-	Serial.print(rtc.temp() / 100);
+	Serial.print((float) rtc.temp() / 100);
 
 	Serial.print(" - SRAM position ");
 	Serial.print(position);

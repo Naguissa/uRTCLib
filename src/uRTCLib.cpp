@@ -18,7 +18,7 @@
  * @url https://github.com/Naguissa/uRTCLib
  * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
  * @email naguissa@foroelectro.net
- * @version 6.2.0
+ * @version 6.2.1
  * @created 2015-05-07
  */
 #include <Arduino.h>
@@ -135,7 +135,7 @@ void uRTCLib::refresh() {
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
-			byte MSB, LSB; // LSB is also used as tmp  variable
+			uint8_t MSB, LSB; // LSB is also used as tmp  variable
 
 			_a1_mode = 0b00000000;
 			_a2_mode = 0b10000000;
@@ -211,9 +211,12 @@ void uRTCLib::refresh() {
 
 			MSB = Wire.read(); //2's complement int portion
 			LSB = Wire.read(); //fraction portion
-			_temp = ((((short)MSB << 8) | (short)LSB) >> 6) * 25;
-
-
+			_temp = (MSB  << 2) | (LSB >> 6); // 8+2 bits, *25 is the same as number + 2bitdecimals * 100 in base 10
+			if (MSB & 0b10000000) {
+				_temp = (_temp | 0b1111110000000000);
+				_temp--;
+			}
+			_temp = _temp * 25; // *25 is the same as number + 2bit (decimals) * 100 in base 10
 			break;
 	}
 }
