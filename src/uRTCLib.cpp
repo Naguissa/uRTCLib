@@ -211,7 +211,7 @@ void uRTCLib::refresh() {
 
 			MSB = Wire.read(); //2's complement int portion
 			LSB = Wire.read(); //fraction portion
-			_temp = (MSB  << 2) | (LSB >> 6); // 8+2 bits, *25 is the same as number + 2bitdecimals * 100 in base 10
+			_temp = 0b0000000000000000 | (MSB  << 2) | (LSB >> 6); // 8+2 bits, *25 is the same as number + 2bitdecimals * 100 in base 10
 			if (MSB & 0b10000000) {
 				_temp = (_temp | 0b1111110000000000);
 				_temp--;
