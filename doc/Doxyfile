@@ -1502,7 +1502,7 @@ TREEVIEW_WIDTH         = 250
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-EXT_LINKS_IN_WINDOW    = NO
+EXT_LINKS_IN_WINDOW    = YES
 
 # Use this tag to change the font size of LaTeX formulas included as images in
 # the HTML documentation. When you change the font size after a successful
@@ -1837,7 +1837,7 @@ LATEX_TIMESTAMP        = NO
 # readers/editors.
 # The default value is: NO.
 
-GENERATE_RTF           = NO
+GENERATE_RTF           = YES
 
 # The RTF_OUTPUT tag is used to specify where the RTF docs will be put. If a
 # relative path is entered the value of OUTPUT_DIRECTORY will be put in front of
