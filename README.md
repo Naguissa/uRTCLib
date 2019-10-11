@@ -30,9 +30,9 @@ For manual installation:
 
 ## Documentation ##
 
-You can find all documentation opening doc/index.html
+You can find all documentation opening /doc/index.html
 
-Due GitHub limitations HTML documentation is not avaliable online. You can see RTF file on https://raw.githubusercontent.com/Naguissa/uRTCLib/master/doc/rtf/refman.rtf
+Due GitHub limitations HTML documentation is not avaliable online, you need to download the zip.
 
 
 ## Examples ##
