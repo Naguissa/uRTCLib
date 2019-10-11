@@ -1,5 +1,6 @@
 /**
- * DS1307, DS3231 and DS3232 RTCs basic library
+ * \class uRTCLib
+ * \brief DS1307, DS3231 and DS3232 RTCs basic library
  *
  * Really tiny library to basic RTC functionality on Arduino.
  *
@@ -11,39 +12,44 @@
  *     * Alarms (1 and 2) for DS3231 and DS3232
  *     * Power failure check for DS3231 and DS3232
  *
- * See uEEPROMLib for EEPROM support.
+ * See uEEPROMLib for EEPROM support, https://github.com/Naguissa/uEEPROMLib
  *
+ * @file uRTCLib.cpp
  * @copyright Naguissa
  * @author Naguissa
- * @url https://github.com/Naguissa/uRTCLib
- * @url https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
- * @email naguissa@foroelectro.net
- * @version 6.2.1
- * @created 2015-05-07
+ * @see <a href="https://github.com/Naguissa/uRTCLib">https://github.com/Naguissa/uRTCLib</a>
+ * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
+ * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
+ * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
+ * @version 6.2.2
  */
+
 #include <Arduino.h>
 #include <Wire.h>
 #include "uRTCLib.h"
 
 /**
- * Constructor
+ * \brief Constructor
  */
 uRTCLib::uRTCLib() { }
 
 /**
- * Constructor
+ * \brief Constructor
  *
- * @param int rtc_address I2C address of RTC
+ * @param rtc_address I2C address of RTC
  */
 uRTCLib::uRTCLib(const int rtc_address) {
 	_rtc_address = rtc_address;
 }
 
 /**
- * Constructor
+ * \brief Constructor
  *
- * @param int rtc_address I2C address of RTC
- * @param uint8_t model RTC model, see URTCLIB_MODEL_DSXXXX defines
+ * @param rtc_address I2C address of RTC
+ * @param model RTC model:
+ *     - #URTCLIB_MODEL_DS1307
+ *     - #URTCLIB_MODEL_DS3231
+ *     - #URTCLIB_MODEL_DS3232
  */
 uRTCLib::uRTCLib(const int rtc_address, const uint8_t model) {
 	_rtc_address = rtc_address;
@@ -51,7 +57,7 @@ uRTCLib::uRTCLib(const int rtc_address, const uint8_t model) {
 }
 
 /**
- * Refresh data from HW RTC
+ * \brief Refresh data from HW RTC
  */
 void uRTCLib::refresh() {
 	uRTCLIB_YIELD
@@ -222,11 +228,11 @@ void uRTCLib::refresh() {
 }
 
 /**
- * Returns lost power VBAT staus
+ * \brief Returns lost power VBAT staus
  *
  * WARNING: DS1307 is known to not have it at a known address
  *
- * @return bool
+ * @return True if power was lost (both power sources, VCC and VBAT)
  */
 bool uRTCLib::lostPower() {
 
@@ -253,11 +259,9 @@ bool uRTCLib::lostPower() {
 }
 
 /**
- * Returns lost power VBAT staus
+ * \brief Clears lost power VBAT staus
  *
  * WARNING: DS1307 is known to not have it at a known address
- *
- * @return bool
  */
 void uRTCLib::lostPowerClear() {
 
@@ -291,11 +295,13 @@ void uRTCLib::lostPowerClear() {
 }
 
 /**
- * Returns actual temperature
+ * \brief Returns actual temperature
  *
- * WARNING: DS1307 has no temperature register, so it always returns URTCLIB_TEMP_ERROR
+ * Temperature is returned as degress * 100; i.e.: 3050 is 30.50º
  *
- * @return int16_t Current stored temperature
+ * WARNING: DS1307 has no temperature register, so it always returns #URTCLIB_TEMP_ERROR
+ *
+ * @return Current stored temperature
  */
 int16_t uRTCLib::temp() {
 	if (_model == URTCLIB_MODEL_DS1307) {
@@ -305,18 +311,18 @@ int16_t uRTCLib::temp() {
 }
 
 /**
- * Returns actual second
+ * \brief Returns actual second
  *
- * @return uint8_t Current stored second
+ * @return Current stored second
  */
 uint8_t uRTCLib::second() {
 	return _second;
 }
 
 /**
- * Returns actual minute
+ * \brief Returns actual minute
  *
- * @return uint8_t Current stored minute
+ * @return Current stored minute
  */
 uint8_t uRTCLib::minute() {
 	return _minute;
@@ -324,45 +330,45 @@ uint8_t uRTCLib::minute() {
 
 
 /**
- * Returns actual hour
+ * \brief Returns actual hour
  *
- * @return uint8_t Current stored hour
+ * @return Current stored hour
  */
 uint8_t uRTCLib::hour() {
 	return _hour;
 }
 
 /**
- * Returns actual day
+ * \brief Returns actual day
  *
- * @return uint8_t Current stored day
+ * @return Current stored day
  */
 uint8_t uRTCLib::day() {
 	return _day;
 }
 
 /**
- * Returns actual month
+ * \brief Returns actual month
  *
- * @return uint8_t Current stored month
+ * @return Current stored month
  */
 uint8_t uRTCLib::month() {
 	return _month;
 }
 
 /**
- * Returns actual year
+ * \brief Returns actual year
  *
- * @return uint8_t Current stored year
+ * @return Current stored year
  */
 uint8_t uRTCLib::year() {
 	return _year;
 }
 
 /**
- * Returns actual Day Of Week
+ * \brief Returns actual Day Of Week
  *
- * @return uint8_t Current stored Day Of Week
+ * @return Current stored Day Of Week
  */
 uint8_t uRTCLib::dayOfWeek() {
 	return _dayOfWeek;
@@ -370,9 +376,9 @@ uint8_t uRTCLib::dayOfWeek() {
 
 
 /**
- * Sets RTC i2 addres
+ * \brief Sets RTC i2 addres
  *
- * @param int RTC i2C address
+ * @param addr RTC i2C address
  */
 void uRTCLib::set_rtc_address(const int addr) {
 	_rtc_address = addr;
@@ -380,33 +386,39 @@ void uRTCLib::set_rtc_address(const int addr) {
 
 
 /**
- * Sets RTC Model
+ * \brief Sets RTC Model
  *
- * @param uint8_t RTC Model
+ * @param model RTC Model
+ *     - #URTCLIB_MODEL_DS1307
+ *     - #URTCLIB_MODEL_DS3231
+ *     - #URTCLIB_MODEL_DS3232
  */
 void uRTCLib::set_model(const uint8_t model) {
 	_model = model;
 }
 
 /**
- * Gets RTC Model
+ * \brief Gets RTC Model
  *
- * @return uint8_t RTC Model
+ * @return RTC Model
+ *     - #URTCLIB_MODEL_DS1307
+ *     - #URTCLIB_MODEL_DS3231
+ *     - #URTCLIB_MODEL_DS3232
  */
 uint8_t uRTCLib::model() {
 	return _model;
 }
 
 /**
- * Sets RTC datetime data
+ * \brief Sets RTC datetime data
  *
- * @param uint8_t second second to set to HW RTC
- * @param uint8_t minute minute to set to HW RTC
- * @param uint8_t hour hour to set to HW RTC
- * @param uint8_t dayOfWeek day of week to set to HW RTC
- * @param uint8_t dayOfMonth day of month to set to HW RTC
- * @param uint8_t month month to set to HW RTC
- * @param uint8_t year year to set to HW RTC
+ * @param second second to set to HW RTC
+ * @param minute minute to set to HW RTC
+ * @param hour hour to set to HW RTC
+ * @param dayOfWeek day of week to set to HW RTC
+ * @param dayOfMonth day of month to set to HW RTC
+ * @param month month to set to HW RTC
+ * @param year year to set to HW RTC
  */
 void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 	uRTCLIB_YIELD
@@ -440,23 +452,34 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 
 
 
-/**
- * Alarms:
- */
+/*************  Alarms: ****************/
 
 
 /**
- * Sets any alarm
+ * \brief Sets any alarm
  *
  * This method can also be used to disable an alarm, but it's better to use alarmDisable(const uint8_t alarm) to do so.
  *
- * @param uint8_t type Alarm type, see URTCLIB_ALARM_TYPE_X_YYYY defines
- * @param uint8_t second second to set Alarm (ignored in Alarm 2)
- * @param uint8_t minute minute to set Alarm
- * @param uint8_t hour hour to set Alarm
- * @param uint8_t day_dow Day of the month or DOW to set Alarm, depending on alarm type
+ * @param type Alarm type:
+ *     - #URTCLIB_ALARM_TYPE_1_NONE
+ *     - #URTCLIB_ALARM_TYPE_1_ALL_S
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_S
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_MS
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_HMS
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_DHMS
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS
+ *     - #URTCLIB_ALARM_TYPE_2_NONE
+ *     - #URTCLIB_ALARM_TYPE_2_ALL_M
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_M
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_HM
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_DHM
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_DOWHM
+ * @param second second to set Alarm (ignored in Alarm 2)
+ * @param minute minute to set Alarm
+ * @param hour hour to set Alarm
+ * @param day_dow Day of the month or DOW to set Alarm, depending on alarm type
  *
- * @return bool false in case of not supported (DS1307) or wrong parameters
+ * @return false in case of not supported (DS1307) or wrong parameters
  */
 bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t day_dow) {
 	bool ret = false;
@@ -617,11 +640,13 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 
 
 /**
- * Disables an alarm
+ * \brief Disables an alarm
  *
- * @param uint8_t alarm Alarm type, see URTCLIB_ALARM_X defines
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
  *
- * @return bool false in case of not supported (DS1307) or wrong parameters
+ * @return false in case of not supported (DS1307) or wrong parameters
  */
 bool uRTCLib::alarmDisable(const uint8_t alarm) {
 	switch (_model) {
@@ -670,11 +695,13 @@ bool uRTCLib::alarmDisable(const uint8_t alarm) {
 }
 
 /**
- * Disables an alarm
+ * \brief Clears an alarm flag
  *
- * @param uint8_t alarm Alarm type, see URTCLIB_ALARM_X defines
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
  *
- * @return bool false in case of not supported (DS1307) or wrong parameters
+ * @return false in case of not supported (DS1307) or wrong parameters
  */
 bool uRTCLib::alarmClearFlag(const uint8_t alarm) {
 	switch (_model) {
@@ -725,9 +752,29 @@ bool uRTCLib::alarmClearFlag(const uint8_t alarm) {
 
 
 /**
- * Returns actual alarm mode. See URTCLIB_ALARM_TYPE_X_YYYYY defines to see modes
+ * \brief Returns actual alarm mode.
  *
- * @return uint8_t Current stored mode. 0b11111111 means error.
+ * See URTCLIB_ALARM_TYPE_X_YYYYY defines to see modes
+ *
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
+ *
+ * @return Current stored mode. 0b11111111 means error.
+ *     - #URTCLIB_ALARM_TYPE_1_NONE
+ *     - #URTCLIB_ALARM_TYPE_1_ALL_S
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_S
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_MS
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_HMS
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_DHMS
+ *     - #URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS
+ *     -    ...or...
+ *     - #URTCLIB_ALARM_TYPE_2_NONE
+ *     - #URTCLIB_ALARM_TYPE_2_ALL_M
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_M
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_HM
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_DHM
+ *     - #URTCLIB_ALARM_TYPE_2_FIXED_DOWHM
  */
 uint8_t uRTCLib::alarmMode(const uint8_t alarm) {
 	switch (_model) {
@@ -753,9 +800,13 @@ uint8_t uRTCLib::alarmMode(const uint8_t alarm) {
 }
 
 /**
- * Returns actual alarm second
+ * \brief Returns actual alarm second
  *
- * @return uint8_t Current stored second. 0b11111111 means error.
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
+ *
+ * @return Current stored second. 0b11111111 means error.
  */
 uint8_t uRTCLib::alarmSecond(const uint8_t alarm) {
 	switch (_model) {
@@ -781,9 +832,13 @@ uint8_t uRTCLib::alarmSecond(const uint8_t alarm) {
 }
 
 /**
- * Returns actual alarm minute
+ * \brief Returns actual alarm minute
  *
- * @return uint8_t Current stored minute. 0b11111111 means error.
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
+ *
+ * @return Current stored minute. 0b11111111 means error.
  */
 uint8_t uRTCLib::alarmMinute(const uint8_t alarm) {
 	switch (_model) {
@@ -810,9 +865,13 @@ uint8_t uRTCLib::alarmMinute(const uint8_t alarm) {
 
 
 /**
- * Returns actual alarm hour
+ * \brief Returns actual alarm hour
  *
- * @return uint8_t Current stored hour. 0b11111111 means error.
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
+ *
+ * @return Current stored hour. 0b11111111 means error.
  */
 uint8_t uRTCLib::alarmHour(const uint8_t alarm) {
 	switch (_model) {
@@ -838,9 +897,13 @@ uint8_t uRTCLib::alarmHour(const uint8_t alarm) {
 }
 
 /**
- * Returns actual alarm day or DOW
+ * \brief Returns actual alarm day or DOW
  *
- * @return uint8_t Current stored day or dow. 0b11111111 means error.
+ * @param alarm Alarm number:
+ *     - #URTCLIB_ALARM_1
+ *     - #URTCLIB_ALARM_2
+ *
+ * @return Current stored day or dow. 0b11111111 means error.
  */
 uint8_t uRTCLib::alarmDayDow(const uint8_t alarm) {
 	switch (_model) {
@@ -866,16 +929,21 @@ uint8_t uRTCLib::alarmDayDow(const uint8_t alarm) {
 }
 
 
-/**
- * SQuare Wave Generator
- */
+/************** SQuare Wave Generator ****************/
 
 /**
- * Changes SQWG mode, including turning it off
+ * \brief Changes SQWG mode, including turning it off
  *
- * @param uint8_t type SQWG mode, see URTCLIB_SQWG_XXXX defines
+ * @param mode SQWG mode:
+ *     - #URTCLIB_SQWG_OFF_0
+ *     - #URTCLIB_SQWG_OFF_1
+ *     - #URTCLIB_SQWG_1H
+ *     - #URTCLIB_SQWG_1024H
+ *     - #URTCLIB_SQWG_4096H
+ *     - #URTCLIB_SQWG_8192H
+ *     - #URTCLIB_SQWG_32768H
  *
- * @return bool false in case of not supported (DS1307) or wrong parameters
+ * @return false in case of not supported (DS1307) or wrong parameters
  */
 bool uRTCLib::sqwgSetMode(const uint8_t mode) {
 	uint8_t status, processAnd = 0b00000000, processOr = 0b00000000;
@@ -1001,26 +1069,31 @@ bool uRTCLib::sqwgSetMode(const uint8_t mode) {
 
 
 /**
- * Gets current SQWG mode
+ * \brief Gets current SQWG mode
  *
- * @return uint8_t SQWG mode, see URTCLIB_SQWG_XXXX defines
+ * @return SQWG mode:
+ *     - #URTCLIB_SQWG_OFF_0
+ *     - #URTCLIB_SQWG_OFF_1
+ *     - #URTCLIB_SQWG_1H
+ *     - #URTCLIB_SQWG_1024H
+ *     - #URTCLIB_SQWG_4096H
+ *     - #URTCLIB_SQWG_8192H
+ *     - #URTCLIB_SQWG_32768H
  */
 uint8_t uRTCLib::sqwgMode() {
 	return _sqwg_mode;
 }
 
 
-/**
- * RAM functionality (Only DS1307. Addresses 08h to 3Fh so we offset 08h positions and limit to 38h as maximum address
- */
+/*** RAM functionality (Only DS1307. Addresses 08h to 3Fh so we offset 08h positions and limit to 38h as maximum address ***/
 
 
 /**
- * Reads a byte from RTC RAM
+ * \brief Reads a byte from RTC RAM
  *
- * @param uint8_t address RAM Address
+ * @param address RAM Address
  *
- * @return byte content of that position. If any error it will return always 0xFF;
+ * @return content of that position. If any error it will return always 0xFF;
  */
 byte uRTCLib::ramRead(const uint8_t address) {
 	uint8_t offset = 0xff;
@@ -1053,14 +1126,13 @@ byte uRTCLib::ramRead(const uint8_t address) {
 
 
 /**
- * Reads a byte from RTC RAM
+ * \brief Writes a byte to RTC RAM
  *
- * @param uint8_t address RAM Address
- * @param byte data Content to write on that position
+ * @param address RAM Address
+ * @param data Content to write on that position
  *
- * @return bool true if correct
+ * @return true if correct
  */
-
 bool uRTCLib::ramWrite(const uint8_t address, byte data) {
 	uint8_t offset = 0xff;
 	switch (_model) {
@@ -1092,6 +1164,4 @@ bool uRTCLib::ramWrite(const uint8_t address, byte data) {
 
 
 
-/**
- * EEPROM functionality has been moved to separate library: https://github.com/Naguissa/uEEPROMLib
- */
+/*** EEPROM functionality has been moved to separate library: https://github.com/Naguissa/uEEPROMLib ***/
