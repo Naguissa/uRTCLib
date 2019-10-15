@@ -1163,5 +1163,4 @@ bool uRTCLib::ramWrite(const uint8_t address, byte data) {
 }
 
 
-
 /*** EEPROM functionality has been moved to separate library: https://github.com/Naguissa/uEEPROMLib ***/
