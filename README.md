@@ -1,5 +1,7 @@
 # Arduino, ESP8266, STM32, ESP32 and others uRTCLib
 
+Master status:   [![Build Status](https://travis-ci.org/Naguissa/uRTCLib.svg?branch=master)](https://travis-ci.org/Naguissa/uRTCLib)
+
 ## What is this repository for? ##
 
 Really tiny library to basic RTC functionality on Arduino, ESP8266, STM32, ESP32 and other microcontrollers.
