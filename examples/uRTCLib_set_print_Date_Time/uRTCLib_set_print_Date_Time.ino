@@ -154,8 +154,13 @@ bool requestDateBySerialAndSet(void) {
     // read exactly 17 characters
     size_t tReadLength = Serial.readBytes(tInputBuffer, 17);
     if (tReadLength == 17 && tInputBuffer[14] == ' ') {
+#if defined(__AVR__)
         sscanf_P(tInputBuffer, PSTR("%2hhu %2hhu %2hhu %2hhu %2hhu %2hhu"), &tHour, &tMinute, &tSecond, &tDayOfMonth, &tMonth,
                 &tYear);
+#else
+        sscanf(tInputBuffer, "%2hhu %2hhu %2hhu %2hhu %2hhu %2hhu", &tHour, &tMinute, &tSecond, &tDayOfMonth, &tMonth,
+                &tYear);
+#endif
         // read newline etc.
         while (Serial.available()) {
             Serial.read();
@@ -299,4 +304,3 @@ void printRTCTime(bool aPrintLongFormat, bool aDoRefresh) {
 #endif
     Serial.print(tTimeString);
 }
-
