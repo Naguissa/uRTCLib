@@ -100,203 +100,206 @@ const char* const sDayStrings[] PROGMEM = { Sunday, Monday, Tuesday, Wednesday, 
 #define DOW_MAX_STRING_SIZE 11 // excluding trailing NUL (Donnerstag)
 
 const char* const sMonthStrings[] PROGMEM = { January, February, March, April, May, June, July, August, September, October,
-        November, December };
+		November, December };
 #define MONTH_MAX_STRING_SIZE 10 // excluding trailing NUL (September)
 
 void setup() {
-    Serial.begin(115200);
-    while (!Serial)
-        ; //delay for Leonardo
-          // Just to know which program is running on my Arduino
-    Serial.println(F("START " __FILE__ "\r\nVersion " VERSION_EXAMPLE " from " __DATE__));
+	Serial.begin(115200);
+	while (!Serial)
+		; //delay for Leonardo
+		  // Just to know which program is running on my Arduino
+	Serial.println(F("START " __FILE__ "\r\nVersion " VERSION_EXAMPLE " from " __DATE__));
 
 #ifdef ARDUINO_ARCH_ESP8266
-        Wire.begin(0, 2); // D3 and D4 on ESP8266
-    #else
-    Wire.begin();
+		Wire.begin(0, 2); // D3 and D4 on ESP8266
+	#else
+	Wire.begin();
 #endif
-    rtc.set_rtc_address(0x68);
-    rtc.set_model(URTCLIB_MODEL_DS3232);
+	rtc.set_rtc_address(0x68);
+	rtc.set_model(URTCLIB_MODEL_DS3232);
 
-    // Only used once, then disabled
-    rtc.set(0, 42, 16, 6, 2, 5, 15);
-    //  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
+	// Only used once, then disabled
+	rtc.set(0, 42, 16, 6, 2, 5, 15);
+	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
 
-    if (rtc.lostPower() || rtc.year() < 19) {
-        if (requestDateBySerialAndSet()) {
-            rtc.lostPowerClear();
-        }
-    }
+	if (rtc.lostPower() || rtc.year() < 19) {
+		if (requestDateBySerialAndSet()) {
+			rtc.lostPowerClear();
+		}
+	}
 }
 
 void loop() {
 
-    /*
-     * Print date and time each second in 5 different formats
-     */
-    if (printRTCEveryPeriod(1)) {
-        printRTC(DATE_FORMAT_EUROPEAN);
-        printRTC(DATE_FORMAT_EUROPEAN_LONG);
-        printRTC(DATE_FORMAT_AMERICAN);
-        printRTC(DATE_FORMAT_AMERICAN_LONG);
-        Serial.println();
-    }
-    delay(1000);
+	/*
+	 * Print date and time each second in 5 different formats
+	 */
+	if (printRTCEveryPeriod(1)) {
+		printRTC(DATE_FORMAT_EUROPEAN);
+		printRTC(DATE_FORMAT_EUROPEAN_LONG);
+		printRTC(DATE_FORMAT_AMERICAN);
+		printRTC(DATE_FORMAT_AMERICAN_LONG);
+		Serial.println();
+	}
+	delay(1000);
 }
 
 bool requestDateBySerialAndSet(void) {
 
-    uint8_t tSecond, tMinute, tHour, tDayOfMonth, tMonth, tYear;
-    char tInputBuffer[17];
-    Serial.println();
-    Serial.println(F("Enter the time in format: \"HH MM SS DD MM YY\" - Timeout is 30 seconds"));
-    Serial.setTimeout(30000);
-    // read exactly 17 characters
-    size_t tReadLength = Serial.readBytes(tInputBuffer, 17);
-    if (tReadLength == 17 && tInputBuffer[14] == ' ') {
-        sscanf_P(tInputBuffer, PSTR("%2hhu %2hhu %2hhu %2hhu %2hhu %2hhu"), &tHour, &tMinute, &tSecond, &tDayOfMonth, &tMonth,
-                &tYear);
-        // read newline etc.
-        while (Serial.available()) {
-            Serial.read();
-        }
-        Serial.setTimeout(10000);
-        Serial.println();
-        Serial.println(F("Enter the day of week as number between 1 and 7 (Sunday-Saturday) - Timeout is 10 seconds"));
-        Serial.readBytes(tInputBuffer, 1);
-        if (tInputBuffer[0] > '0' && tInputBuffer[0] < '8') {
-            rtc.set(tSecond, tMinute, tHour, tInputBuffer[0] - '0', tDayOfMonth, tMonth, tYear);
-            Serial.print(F("Time set to: "));
-            printRTC();
-            return true;
-        }
-    }
-    Serial.println(F("Clock has not been changed, press reset for next try."));
-    return false;
+	uint8_t tSecond, tMinute, tHour, tDayOfMonth, tMonth, tYear;
+	char tInputBuffer[17];
+	Serial.println();
+	Serial.println(F("Enter the time in format: \"HH MM SS DD MM YY\" - Timeout is 30 seconds"));
+	Serial.setTimeout(30000);
+	// read exactly 17 characters
+	size_t tReadLength = Serial.readBytes(tInputBuffer, 17);
+	if (tReadLength == 17 && tInputBuffer[14] == ' ') {
+		#ifdef AVR
+			sscanf_P(tInputBuffer, PSTR("%2hhu %2hhu %2hhu %2hhu %2hhu %2hhu"), &tHour, &tMinute, &tSecond, &tDayOfMonth, &tMonth, &tYear);
+		#else
+			sscanf(tInputBuffer, "%2hhu %2hhu %2hhu %2hhu %2hhu %2hhu", &tHour, &tMinute, &tSecond, &tDayOfMonth, &tMonth, &tYear);
+		#endif
+		// read newline etc.
+		while (Serial.available()) {
+			Serial.read();
+		}
+		Serial.setTimeout(10000);
+		Serial.println();
+		Serial.println(F("Enter the day of week as number between 1 and 7 (Sunday-Saturday) - Timeout is 10 seconds"));
+		Serial.readBytes(tInputBuffer, 1);
+		if (tInputBuffer[0] > '0' && tInputBuffer[0] < '8') {
+			rtc.set(tSecond, tMinute, tHour, tInputBuffer[0] - '0', tDayOfMonth, tMonth, tYear);
+			Serial.print(F("Time set to: "));
+			printRTC();
+			return true;
+		}
+	}
+	Serial.println(F("Clock has not been changed, press reset for next try."));
+	return false;
 }
 
 /*
  * @return true if update/refresh happened
  */
 bool printRTCEveryPeriod(uint16_t aPeriodSeconds, uint8_t aDateFormatSpecifier) {
-    static long sLastMillisOfRTCRead;
-    if (millis() - sLastMillisOfRTCRead >= (1000 * aPeriodSeconds)) {
-        sLastMillisOfRTCRead = millis();
-        rtc.refresh();
-        printRTC(aDateFormatSpecifier);
-        return true;
-    }
-    return false;
+	static long sLastMillisOfRTCRead;
+	if (millis() - sLastMillisOfRTCRead >= (1000 * aPeriodSeconds)) {
+		sLastMillisOfRTCRead = millis();
+		rtc.refresh();
+		printRTC(aDateFormatSpecifier);
+		return true;
+	}
+	return false;
 }
 
 void printRTC(uint8_t aDateFormatSpecifier) {
-    rtc.refresh();
-    printRTCDate(aDateFormatSpecifier);
-    Serial.print(' ');
-    printRTCTime((aDateFormatSpecifier & DATE_FORMAT_LONG_MASK), false);
-    Serial.println();
+	rtc.refresh();
+	printRTCDate(aDateFormatSpecifier);
+	Serial.print(' ');
+	printRTCTime((aDateFormatSpecifier & DATE_FORMAT_LONG_MASK), false);
+	Serial.println();
 }
 
 void printRTCDateAmericanFormat(bool aPrintLongFormat) {
 #if defined(__AVR__)
-    char tDateString[(2 * DOW_MAX_STRING_SIZE) + 1 + (2 * MONTH_MAX_STRING_SIZE) + 1 + 12];
+	char tDateString[(2 * DOW_MAX_STRING_SIZE) + 1 + (2 * MONTH_MAX_STRING_SIZE) + 1 + 12];
 #else
-    char tDateString[DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE + 12];
+	char tDateString[DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE + 12];
 #endif
 
-    if (aPrintLongFormat) {
+	if (aPrintLongFormat) {
 #if defined(__AVR__)
-        // fist copy day of week
-        strcpy_P(&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
-                (PGM_P) pgm_read_word(&sDayStrings[rtc.dayOfWeek() - 1]));
-        strcpy_P(&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2],
-                (PGM_P) pgm_read_word(&sMonthStrings[rtc.month() - 1]));
-        sprintf_P(tDateString, PSTR("%s, %s %2hhu, 20%2hhu"),
-                &tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
-                &tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2], rtc.day(), rtc.year());
+		// fist copy day of week
+		strcpy_P(&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
+				(PGM_P) pgm_read_word(&sDayStrings[rtc.dayOfWeek() - 1]));
+		strcpy_P(&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2],
+				(PGM_P) pgm_read_word(&sMonthStrings[rtc.month() - 1]));
+		sprintf_P(tDateString, PSTR("%s, %s %2hhu, 20%2hhu"),
+				&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
+				&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2], rtc.day(), rtc.year());
 #else
-        sprintf(tDateString, "%s, %s %2hhu, 20%2hhu", sDayStrings[rtc.dayOfWeek() - 1],
-                sMonthStrings[rtc.month() - 1], rtc.day(), rtc.year());
+		sprintf(tDateString, "%s, %s %2hhu, 20%2hhu", sDayStrings[rtc.dayOfWeek() - 1],
+				sMonthStrings[rtc.month() - 1], rtc.day(), rtc.year());
 #endif
-    } else {
-        sprintf_P(tDateString, PSTR("%02hhu/%02hhu/20%2hhu"), rtc.month(), rtc.day(), rtc.year());
-    }
-    Serial.print(tDateString);
+	} else {
+		sprintf_P(tDateString, PSTR("%02hhu/%02hhu/20%2hhu"), rtc.month(), rtc.day(), rtc.year());
+	}
+	Serial.print(tDateString);
 }
 
 void printRTCDateEuropeanFormat(bool aPrintLongFormat) {
 #if defined(__AVR__)
-    char tDateString[(2 * DOW_MAX_STRING_SIZE) + 1 + (2 * MONTH_MAX_STRING_SIZE) + 1 + 12];
+	char tDateString[(2 * DOW_MAX_STRING_SIZE) + 1 + (2 * MONTH_MAX_STRING_SIZE) + 1 + 12];
 #else
-    char tDateString[DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE + 12];
+	char tDateString[DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE + 12];
 #endif
 
-    if (aPrintLongFormat) {
+	if (aPrintLongFormat) {
 #if defined(__AVR__)
-        // fist copy day of week
-        strcpy_P(&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
-                (PGM_P) pgm_read_word(&sDayStrings[rtc.dayOfWeek() - 1]));
-        strcpy_P(&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2],
-                (PGM_P) pgm_read_word(&sMonthStrings[rtc.month() - 1]));
-        sprintf_P(tDateString, PSTR("%s, %2hhu. %s 20%2hhu"),
-                &tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3], rtc.day(),
-                &tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2], rtc.year());
+		// fist copy day of week
+		strcpy_P(&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
+				(PGM_P) pgm_read_word(&sDayStrings[rtc.dayOfWeek() - 1]));
+		strcpy_P(&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2],
+				(PGM_P) pgm_read_word(&sMonthStrings[rtc.month() - 1]));
+		sprintf_P(tDateString, PSTR("%s, %2hhu. %s 20%2hhu"),
+				&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3], rtc.day(),
+				&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2], rtc.year());
 #else
-        sprintf(tDateString, "%s, %2hhu. %s 20%2hhu", sDayStrings[rtc.dayOfWeek() - 1], rtc.day(),
-                sMonthStrings[rtc.month() - 1], rtc.year());
+		sprintf(tDateString, "%s, %2hhu. %s 20%2hhu", sDayStrings[rtc.dayOfWeek() - 1], rtc.day(),
+				sMonthStrings[rtc.month() - 1], rtc.year());
 #endif
-    } else {
-        sprintf_P(tDateString, PSTR("%02hhu.%02hhu.20%2hhu"), rtc.day(), rtc.month(), rtc.year());
-    }
-    Serial.print(tDateString);
+	} else {
+		sprintf_P(tDateString, PSTR("%02hhu.%02hhu.20%2hhu"), rtc.day(), rtc.month(), rtc.year());
+	}
+	Serial.print(tDateString);
 }
 
 void printRTCDateISOFormat() {
-    char tDateString[11];
+	char tDateString[11];
 #if defined(__AVR__)
-    sprintf_P(tDateString, PSTR("20%2hhu-%02hhu-%02hhu"), rtc.year(), rtc.month(), rtc.day());
+	sprintf_P(tDateString, PSTR("20%2hhu-%02hhu-%02hhu"), rtc.year(), rtc.month(), rtc.day());
 #else
-    sprintf(tDateString, "20%2hhu-%02hhu-%02hhu", rtc.year(), rtc.month(), rtc.day());
+	sprintf(tDateString, "20%2hhu-%02hhu-%02hhu", rtc.year(), rtc.month(), rtc.day());
 #endif
-    Serial.print(tDateString);
+	Serial.print(tDateString);
 }
 
 void printRTCDate(uint8_t aDateFormatSpecifier) {
 
-    if (aDateFormatSpecifier & DATE_FORMAT_AMERICAN) {
-        printRTCDateAmericanFormat((aDateFormatSpecifier & DATE_FORMAT_LONG_MASK));
-    } else if (aDateFormatSpecifier & DATE_FORMAT_EUROPEAN) {
-        printRTCDateEuropeanFormat((aDateFormatSpecifier & DATE_FORMAT_LONG_MASK));
-    } else {
+	if (aDateFormatSpecifier & DATE_FORMAT_AMERICAN) {
+		printRTCDateAmericanFormat((aDateFormatSpecifier & DATE_FORMAT_LONG_MASK));
+	} else if (aDateFormatSpecifier & DATE_FORMAT_EUROPEAN) {
+		printRTCDateEuropeanFormat((aDateFormatSpecifier & DATE_FORMAT_LONG_MASK));
+	} else {
 // ISO Format
-        printRTCDateISOFormat();
-    }
+		printRTCDateISOFormat();
+	}
 }
 
 void printRTCTemperature() {
-    Serial.print(rtc.temp() / 100);
-    Serial.print('.');
-    Serial.print(rtc.temp() - ((rtc.temp() / 100) * 100));
+	Serial.print(rtc.temp() / 100);
+	Serial.print('.');
+	Serial.print(rtc.temp() - ((rtc.temp() / 100) * 100));
 }
 
 void printRTCTime(bool aPrintLongFormat, bool aDoRefresh) {
-    if (aDoRefresh) {
-        rtc.refresh();
-    }
-    char tTimeString[9]; // 8 + trailing NUL character
+	if (aDoRefresh) {
+		rtc.refresh();
+	}
+	char tTimeString[9]; // 8 + trailing NUL character
 #if defined(__AVR__)
-    if (aPrintLongFormat) {
-        sprintf_P(tTimeString, PSTR("%02hhu:%02hhu:%02hhu"), rtc.hour(), rtc.minute(), rtc.second());
-    } else {
-        sprintf_P(tTimeString, PSTR("%02hhu:%02hhu"), rtc.hour(), rtc.minute());
-    }
+	if (aPrintLongFormat) {
+		sprintf_P(tTimeString, PSTR("%02hhu:%02hhu:%02hhu"), rtc.hour(), rtc.minute(), rtc.second());
+	} else {
+		sprintf_P(tTimeString, PSTR("%02hhu:%02hhu"), rtc.hour(), rtc.minute());
+	}
 #else
-    if (aPrintLongFormat) {
-        sprintf(tTimeString, "%02hhu:%02hhu:%02hhu", rtc.hour(), rtc.minute(), rtc.second());
-    } else {
-        sprintf(tTimeString, "%02hhu:%02hhu", rtc.hour(), rtc.minute());
-    }
+	if (aPrintLongFormat) {
+		sprintf(tTimeString, "%02hhu:%02hhu:%02hhu", rtc.hour(), rtc.minute(), rtc.second());
+	} else {
+		sprintf(tTimeString, "%02hhu:%02hhu", rtc.hour(), rtc.minute());
+	}
 #endif
-    Serial.print(tTimeString);
+	Serial.print(tTimeString);
 }
 
