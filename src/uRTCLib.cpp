@@ -79,15 +79,15 @@ void uRTCLib::refresh() {
 			break;
 	}
 
-	_second = Wire.read();
+	_second = Wire.read() & 0b01111111;
 	uRTCLIB_YIELD
 	_second = uRTCLIB_bcdToDec(_second);
 
-	_minute = Wire.read();
+	_minute = Wire.read() & 0b01111111;
 	uRTCLIB_YIELD
 	_minute = uRTCLIB_bcdToDec(_minute);
 
-	_hour = Wire.read() & 0b111111;
+	_hour = Wire.read() & 0b00111111;
 	uRTCLIB_YIELD
 	_hour = uRTCLIB_bcdToDec(_hour);
 
@@ -149,42 +149,49 @@ void uRTCLib::refresh() {
 			_a1_second = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_second & 0b10000000) >> 7);
+			_a1_second = _a1_second & 0b01111111;
 			_a1_second = uRTCLIB_bcdToDec(_a1_second);
 
 			_a1_minute = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_minute & 0b10000000) >> 6);
+			_a1_minute = _a1_minute & 0b01111111;
 			_a1_minute = uRTCLIB_bcdToDec(_a1_minute);
 
-			_a1_hour = Wire.read() & 0b111111;
+			_a1_hour = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_hour & 0b10000000) >> 5);
+			_a1_hour = _a1_hour & 0b00111111;
 			_a1_hour = uRTCLIB_bcdToDec(_a1_hour);
 
 			_a1_day_dow = Wire.read();
 			uRTCLIB_YIELD
-			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 4);
+			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 3);
 			if (!(_a1_mode & 0b00001111)) {
 				_a1_mode = _a1_mode | ((_a1_day_dow & 0b01000000) >> 3);
 			}
-			_a1_day_dow = uRTCLIB_bcdToDec(_a2_day_dow);
+			_a1_day_dow = _a1_day_dow & 0b00111111;
+			_a1_day_dow = uRTCLIB_bcdToDec(_a1_day_dow);
 
 			_a2_minute = Wire.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_minute & 0b10000000) >> 7);
+			_a2_minute = _a2_minute & 0b01111111;
 			_a2_minute = uRTCLIB_bcdToDec(_a2_minute);
 
-			_a2_hour = Wire.read() & 0b111111;
+			_a2_hour = Wire.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_hour & 0b10000000) >> 6);
+			_a2_hour = _a2_hour & 0b00111111;
 			_a2_hour = uRTCLIB_bcdToDec(_a2_hour);
 
 			_a2_day_dow = Wire.read();
 			uRTCLIB_YIELD
-			_a2_mode = _a2_mode | ((_a2_day_dow & 0b10000000) >> 5);
+			_a2_mode = _a2_mode | ((_a2_day_dow & 0b10000000) >> 4);
 			if (!(_a2_mode & 0b00000111)) {
 				_a2_mode = _a2_mode | ((_a2_day_dow & 0b01000000) >> 4);
 			}
+			_a2_day_dow = _a2_day_dow & 0b00111111;
 			_a2_day_dow = uRTCLIB_bcdToDec(_a2_day_dow);
 
 
@@ -551,9 +558,9 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 						uRTCLIB_YIELD
 						Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit1
 						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(hour) & 0b01111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit2
+						Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit2
 						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00011000) << 3)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit3 & mode/DY-DT (bit4)
+						Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00011000) << 3)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
 						uRTCLIB_YIELD
 						Wire.endTransmission();
 						uRTCLIB_YIELD
@@ -591,13 +598,13 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 						ret = true;
 						Wire.beginTransmission(_rtc_address);
 						uRTCLIB_YIELD
-						Wire.write(0x07); // set next input to start at the seconds register
+						Wire.write(0x0B); // set next input to start at the minutes register
 						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 7)); // set minutes & mode/bit1
+						Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000001) << 7)); // set minutes & mode/bit0
 						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(hour) & 0b01111111) | ((type & 0b00000100) << 6)); // set hours & mode/bit2
+						Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000010) << 6)); // set hours & mode/bit1
 						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00011000) << 4)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit3 & mode/DY-DT (bit4)
+						Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001100) << 4)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
 						uRTCLIB_YIELD
 						Wire.endTransmission();
 						uRTCLIB_YIELD
