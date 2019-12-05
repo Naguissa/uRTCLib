@@ -18,7 +18,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.3
+ * @version 6.2.4
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -57,68 +57,90 @@
 
 	/**
 	 * \brief Alarm 1 - Disabled
+	 * 
+	 * Alarm1 structure:
+	 * 
+	 * bit 0 - A1M1
+	 * bit 1 - A1M2
+	 * bit 2 - A1M3
+	 * bit 3 - A1M4
+	 * bit 4 - A1 DT/DY
+	 * bit 5 - A1 Enabled
+	 * bit 6 - Unused, always 0
+	 * bit 7 - Always 0
 	 */
-	#define URTCLIB_ALARM_TYPE_1_NONE 0b00100000
+	#define URTCLIB_ALARM_TYPE_1_NONE 0b00000000
 
 	/**
 	 * \brief Alarm 1 - Trigger every second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_ALL_S 0b00010111
+	#define URTCLIB_ALARM_TYPE_1_ALL_S 0b00100111
 
 	/**
 	 * \brief Alarm 1 - Trigger every minute at a fixed second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_S 0b00010110
+	#define URTCLIB_ALARM_TYPE_1_FIXED_S 0b00100110
 
 	/**
 	 * \brief Alarm 1 - Trigger every hour at a fixed minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_MS 0b00010100
+	#define URTCLIB_ALARM_TYPE_1_FIXED_MS 0b00100100
 
 	/**
 	 * \brief Alarm 1 - Trigger every day at a fixed hour, minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_HMS 0b00010000
+	#define URTCLIB_ALARM_TYPE_1_FIXED_HMS 0b00100000
 
 	/**
 	 * \brief Alarm 1 - Trigger every month at a fixed day, hour, minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_DHMS 0b00000000
+	#define URTCLIB_ALARM_TYPE_1_FIXED_DHMS 0b00100000
 
 	/**
 	 * \brief Alarm 1 - Trigger every week at a fixed day-of-week, hour, minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS 0b00001000
+	#define URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS 0b00101000
 
 	/**
 	 * \brief Alarm 2 - Disabled
+	 * 
+	 * Alarm1 structure:
+	 * 
+	 * bit 0 - A2M1 - Unused, always 0
+	 * bit 1 - A2M2
+	 * bit 2 - A2M3
+	 * bit 3 - A2M4
+	 * bit 4 - A2 DT/DY
+	 * bit 5 - A2 Enabled
+	 * bit 6 - Unused, always 0
+	 * bit 7 - Always 1
 	 */
-	#define URTCLIB_ALARM_TYPE_2_NONE 0b10100000
+	#define URTCLIB_ALARM_TYPE_2_NONE 0b10000000
 
 	/**
 	 * \brief Alarm 2 - Trigger every minute at 00 seconds
 	 */
-	#define URTCLIB_ALARM_TYPE_2_ALL_M 0b10001011
+	#define URTCLIB_ALARM_TYPE_2_ALL_M 0b10101110
 
 	/**
 	 * \brief Alarm 2 - Trigger every hour at minute and 00 seconds
 	 */
-	#define URTCLIB_ALARM_TYPE_2_FIXED_M 0b10001010
+	#define URTCLIB_ALARM_TYPE_2_FIXED_M 0b10101100
 
 	/**
 	 * \brief Alarm 2 - Trigger every day at hour, minute and 00 seconds
 	 */
-	#define URTCLIB_ALARM_TYPE_2_FIXED_HM 0b10001000
+	#define URTCLIB_ALARM_TYPE_2_FIXED_HM 0b10101000
 
 	/**
 	 * \brief Alarm 2 - Trigger every month at day, hour, minute and 00 seconds
 	 */
-	#define URTCLIB_ALARM_TYPE_2_FIXED_DHM 0b10000000
+	#define URTCLIB_ALARM_TYPE_2_FIXED_DHM 0b10100000
 
 	/**
 	 * \brief Alarm 2 - Trigger every week at day-of-week, hour, minute and 00 seconds
 	 */
-	#define URTCLIB_ALARM_TYPE_2_FIXED_DOWHM 0b10000100
+	#define URTCLIB_ALARM_TYPE_2_FIXED_DOWHM 0b10110000
 
 
 	/**

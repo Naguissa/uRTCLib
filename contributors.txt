@@ -4,3 +4,4 @@ SergDesher - https://github.com/sergdesher - DS3231 temperature sensor reading
 ArminJo - https://github.com/ArminJo - Alarm1 off status fix -- Extra example demosntrating set date via Serial -- Fixes
 Son Bui - https://github.com/t2t-sonbui - Power Lost functionality
 Brian Park - https://github.com/bxparks - Temperature as fixed point to remove floats
+Grepis - https://github.com/grepis - Find & fix some alarm bugs

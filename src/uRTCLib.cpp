@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.3
+ * @version 6.2.4
  */
 
 #include <Arduino.h>
@@ -143,30 +143,27 @@ void uRTCLib::refresh() {
 		default:
 			uint8_t MSB, LSB; // LSB is also used as tmp  variable
 
-			_a1_mode = 0b00000000;
-			_a2_mode = 0b10000000;
+			_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
+			_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 
 			_a1_second = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_second & 0b10000000) >> 7);
-			_a1_second = _a1_second & 0b01111111;
-			_a1_second = uRTCLIB_bcdToDec(_a1_second);
+			_a1_second = uRTCLIB_bcdToDec(_a1_second & 0b01111111);
 
 			_a1_minute = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_minute & 0b10000000) >> 6);
-			_a1_minute = _a1_minute & 0b01111111;
-			_a1_minute = uRTCLIB_bcdToDec(_a1_minute);
+			_a1_minute = uRTCLIB_bcdToDec(_a1_minute & 0b01111111);
 
 			_a1_hour = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_hour & 0b10000000) >> 5);
-			_a1_hour = _a1_hour & 0b00111111;
-			_a1_hour = uRTCLIB_bcdToDec(_a1_hour);
+			_a1_hour = uRTCLIB_bcdToDec(_a1_hour & 0b00111111);
 
 			_a1_day_dow = Wire.read();
 			uRTCLIB_YIELD
-			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 3);
+			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 4);
 			if (!(_a1_mode & 0b00001111)) {
 				_a1_mode = _a1_mode | ((_a1_day_dow & 0b01000000) >> 3);
 			}
@@ -175,24 +172,23 @@ void uRTCLib::refresh() {
 
 			_a2_minute = Wire.read();
 			uRTCLIB_YIELD
-			_a2_mode = _a2_mode | ((_a2_minute & 0b10000000) >> 7);
+			_a2_mode = _a2_mode | ((_a2_minute & 0b10000000) >> 6);
 			_a2_minute = _a2_minute & 0b01111111;
 			_a2_minute = uRTCLIB_bcdToDec(_a2_minute);
 
 			_a2_hour = Wire.read();
 			uRTCLIB_YIELD
-			_a2_mode = _a2_mode | ((_a2_hour & 0b10000000) >> 6);
+			_a2_mode = _a2_mode | ((_a2_hour & 0b10000000) >> 5);
 			_a2_hour = _a2_hour & 0b00111111;
 			_a2_hour = uRTCLIB_bcdToDec(_a2_hour);
 
 			_a2_day_dow = Wire.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_day_dow & 0b10000000) >> 4);
-			if (!(_a2_mode & 0b00000111)) {
-				_a2_mode = _a2_mode | ((_a2_day_dow & 0b01000000) >> 4);
+			if (!(_a2_mode & 0b00001110)) { // M4-M2 is 0, check DT/DY
+				_a2_mode = _a2_mode | ((_a2_day_dow & 0b01000000) >> 3);
 			}
-			_a2_day_dow = _a2_day_dow & 0b00111111;
-			_a2_day_dow = uRTCLIB_bcdToDec(_a2_day_dow);
+			_a2_day_dow = uRTCLIB_bcdToDec(_a2_day_dow & 0b00111111);
 
 
 			// Control registers
@@ -202,10 +198,14 @@ void uRTCLib::refresh() {
 			if (LSB & 0b00000100) {
 				_sqwg_mode = URTCLIB_SQWG_OFF_1;
 				// Alarms disabled?
-				if (!(LSB & 0b00000001)) {
+				if (LSB & 0b00000001) {
+					_a1_mode |= 0b001000000;
+				} else {
 					_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 				}
-				if (!(LSB & 0b00000010)) {
+				if (LSB & 0b00000010) {
+					_a2_mode |= 0b001000000;
+				} else {
 					_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 				}
 			} else {
