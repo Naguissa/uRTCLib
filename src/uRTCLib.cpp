@@ -491,7 +491,9 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t day_dow) {
 	bool ret = false;
 	uint8_t status;
-
+	if (_model == URTCLIB_MODEL_DS1307) {
+		return false;
+	}
 	uRTCLIB_YIELD
 
 	if (type == URTCLIB_ALARM_TYPE_1_NONE) {
@@ -539,106 +541,96 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 		uRTCLIB_YIELD
 		_a2_mode = type;
 	} else {
-		switch (_model) {
-			case URTCLIB_MODEL_DS1307:
-				ret = false;
+		switch (type & 0b10000000) {
+			case 0b00000000: // Alarm 1
+				ret = true;
+				Wire.beginTransmission(_rtc_address);
+				uRTCLIB_YIELD
+				Wire.write(0x07); // set next input to start at the seconds register
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(second) & 0b01111111) | ((type & 0b00000001) << 7)); // set seconds & mode/bit1
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit2
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit3
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001000) << 4) | ((type & 0b00010000) << 2)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT
+				uRTCLIB_YIELD
+				Wire.endTransmission();
+				uRTCLIB_YIELD
+
+				// Enable Alarm:
+				Wire.beginTransmission(_rtc_address);
+				uRTCLIB_YIELD
+				Wire.write(0x0E);
+				uRTCLIB_YIELD
+				Wire.endTransmission();
+				uRTCLIB_YIELD
+				Wire.requestFrom(_rtc_address, 1);
+				uRTCLIB_YIELD
+				status = Wire.read();
+				status = status | 0b00000101;  // INTCN and A1IE bits
+				Wire.beginTransmission(_rtc_address);
+				uRTCLIB_YIELD
+				Wire.write(0x0E);
+				uRTCLIB_YIELD
+				Wire.write(status);
+				uRTCLIB_YIELD
+				Wire.endTransmission();
+				uRTCLIB_YIELD
+
+				_a1_mode = type;
+				_a1_second = second;
+				_a1_minute = minute;
+				_a1_hour = hour;
+				_a1_day_dow = day_dow;
+				_sqwg_mode = URTCLIB_SQWG_OFF_1;
+
 				break;
 
-			// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
-			// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
-			default:
-				switch (type & 0b11000000) {
-					case 0b00000000: // Alarm 1
-						ret = true;
-						Wire.beginTransmission(_rtc_address);
-						uRTCLIB_YIELD
-						Wire.write(0x07); // set next input to start at the seconds register
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(second) & 0b01111111) | ((type & 0b00000001) << 7)); // set seconds & mode/bit0
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit1
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit2
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00011000) << 3)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
-						uRTCLIB_YIELD
-						Wire.endTransmission();
-						uRTCLIB_YIELD
+			case 0b10000000: // Alarm 2
+				ret = true;
+				Wire.beginTransmission(_rtc_address);
+				uRTCLIB_YIELD
+				Wire.write(0x0B); // set next input to start at the minutes register
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit2
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit3
+				uRTCLIB_YIELD
+				Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001000) << 4) | ((type & 0b00010000) << 2)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
+				uRTCLIB_YIELD
+				Wire.endTransmission();
+				uRTCLIB_YIELD
 
-						// Enable Alarm:
-						Wire.beginTransmission(_rtc_address);
-						uRTCLIB_YIELD
-						Wire.write(0x0E);
-						uRTCLIB_YIELD
-						Wire.endTransmission();
-						uRTCLIB_YIELD
-						Wire.requestFrom(_rtc_address, 1);
-						uRTCLIB_YIELD
-						status = Wire.read();
-						status = status | 0b00000101;  // INTCN and A1IE bits
-						Wire.beginTransmission(_rtc_address);
-						uRTCLIB_YIELD
-						Wire.write(0x0E);
-						uRTCLIB_YIELD
-						Wire.write(status);
-						uRTCLIB_YIELD
-						Wire.endTransmission();
-						uRTCLIB_YIELD
+				// Enable Alarm:
+				Wire.beginTransmission(_rtc_address);
+				uRTCLIB_YIELD
+				Wire.write(0x0E);
+				uRTCLIB_YIELD
+				Wire.endTransmission();
+				uRTCLIB_YIELD
+				Wire.requestFrom(_rtc_address, 1);
+				uRTCLIB_YIELD
+				status = Wire.read();
+				status = status | 0b00000110;  // INTCN and A2IE bits
+				Wire.beginTransmission(_rtc_address);
+				uRTCLIB_YIELD
+				Wire.write(0x0E);
+				uRTCLIB_YIELD
+				Wire.write(status);
+				uRTCLIB_YIELD
+				Wire.endTransmission();
+				uRTCLIB_YIELD
 
-						_a1_mode = type;
-						_a1_second = second;
-						_a1_minute = minute;
-						_a1_hour = hour;
-						_a1_day_dow = day_dow;
-						_sqwg_mode = URTCLIB_SQWG_OFF_1;
+				_a2_mode = type;
+				_a2_minute = minute;
+				_a2_hour = hour;
+				_a2_day_dow = day_dow;
+				_sqwg_mode = URTCLIB_SQWG_OFF_1;
 
-						break;
-
-					case 0b10000000: // Alarm 2
-						ret = true;
-						Wire.beginTransmission(_rtc_address);
-						uRTCLIB_YIELD
-						Wire.write(0x0B); // set next input to start at the minutes register
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000001) << 7)); // set minutes & mode/bit0
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000010) << 6)); // set hours & mode/bit1
-						uRTCLIB_YIELD
-						Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001100) << 4)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
-						uRTCLIB_YIELD
-						Wire.endTransmission();
-						uRTCLIB_YIELD
-
-						// Enable Alarm:
-						Wire.beginTransmission(_rtc_address);
-						uRTCLIB_YIELD
-						Wire.write(0x0E);
-						uRTCLIB_YIELD
-						Wire.endTransmission();
-						uRTCLIB_YIELD
-						Wire.requestFrom(_rtc_address, 1);
-						uRTCLIB_YIELD
-						status = Wire.read();
-						status = status | 0b00000110;  // INTCN and A2IE bits
-						Wire.beginTransmission(_rtc_address);
-						uRTCLIB_YIELD
-						Wire.write(0x0E);
-						uRTCLIB_YIELD
-						Wire.write(status);
-						uRTCLIB_YIELD
-						Wire.endTransmission();
-						uRTCLIB_YIELD
-
-						_a2_mode = type;
-						_a2_minute = minute;
-						_a2_hour = hour;
-						_a2_day_dow = day_dow;
-						_sqwg_mode = URTCLIB_SQWG_OFF_1;
-
-						break;
-				} // Alarm type switch
 				break;
-		} // model switch
+		} // Alarm type switch
 		uRTCLIB_YIELD
 	} // if..else
 	return ret;
