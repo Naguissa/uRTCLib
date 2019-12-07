@@ -74,22 +74,22 @@
 	/**
 	 * \brief Alarm 1 - Trigger every second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_ALL_S 0b00100111
+	#define URTCLIB_ALARM_TYPE_1_ALL_S 0b00101111
 
 	/**
 	 * \brief Alarm 1 - Trigger every minute at a fixed second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_S 0b00100110
+	#define URTCLIB_ALARM_TYPE_1_FIXED_S 0b00101110
 
 	/**
 	 * \brief Alarm 1 - Trigger every hour at a fixed minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_MS 0b00100100
+	#define URTCLIB_ALARM_TYPE_1_FIXED_MS 0b00101100
 
 	/**
 	 * \brief Alarm 1 - Trigger every day at a fixed hour, minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_HMS 0b00100000
+	#define URTCLIB_ALARM_TYPE_1_FIXED_HMS 0b00101000
 
 	/**
 	 * \brief Alarm 1 - Trigger every month at a fixed day, hour, minute and second
@@ -99,7 +99,7 @@
 	/**
 	 * \brief Alarm 1 - Trigger every week at a fixed day-of-week, hour, minute and second
 	 */
-	#define URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS 0b00101000
+	#define URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS 0b00110000
 
 	/**
 	 * \brief Alarm 2 - Disabled
