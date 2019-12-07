@@ -149,23 +149,24 @@ void uRTCLib::refresh() {
 			_a1_second = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_second & 0b10000000) >> 7);
-			_a1_second = uRTCLIB_bcdToDec(_a1_second & 0b01111111);
+			_a1_second = uRTCLIB_bcdToDec((_a1_second & 0b01111111));   //parentheses for bitwise operation as argument for uRTCLIB_bcdToDec is required
+																		//otherwise wrong result will be returned by function
 
 			_a1_minute = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_minute & 0b10000000) >> 6);
-			_a1_minute = uRTCLIB_bcdToDec(_a1_minute & 0b01111111);
+			_a1_minute = uRTCLIB_bcdToDec((_a1_minute & 0b01111111));
 
 			_a1_hour = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_hour & 0b10000000) >> 5);
-			_a1_hour = uRTCLIB_bcdToDec(_a1_hour & 0b00111111);
+			_a1_hour = uRTCLIB_bcdToDec((_a1_hour & 0b00111111));
 
 			_a1_day_dow = Wire.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 4);
 			if (!(_a1_mode & 0b00001111)) {
-				_a1_mode = _a1_mode | ((_a1_day_dow & 0b01000000) >> 3);
+				_a1_mode = _a1_mode | ((_a1_day_dow & 0b01000000) >> 2);
 			}
 			_a1_day_dow = _a1_day_dow & 0b00111111;
 			_a1_day_dow = uRTCLIB_bcdToDec(_a1_day_dow);
@@ -186,7 +187,7 @@ void uRTCLib::refresh() {
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_day_dow & 0b10000000) >> 4);
 			if (!(_a2_mode & 0b00001110)) { // M4-M2 is 0, check DT/DY
-				_a2_mode = _a2_mode | ((_a2_day_dow & 0b01000000) >> 3);
+				_a2_mode = _a2_mode | ((_a2_day_dow & 0b01000000) >> 2);
 			}
 			_a2_day_dow = uRTCLIB_bcdToDec(_a2_day_dow & 0b00111111);
 
@@ -199,12 +200,12 @@ void uRTCLib::refresh() {
 				_sqwg_mode = URTCLIB_SQWG_OFF_1;
 				// Alarms disabled?
 				if (LSB & 0b00000001) {
-					_a1_mode |= 0b001000000;
+					_a1_mode |= 0b00100000;
 				} else {
 					_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 				}
 				if (LSB & 0b00000010) {
-					_a2_mode |= 0b001000000;
+					_a2_mode |= 0b00100000;
 				} else {
 					_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 				}
