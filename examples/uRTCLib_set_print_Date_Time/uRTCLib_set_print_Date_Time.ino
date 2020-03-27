@@ -218,11 +218,11 @@ void printRTCDateAmericanFormat(bool aPrintLongFormat) {
 				&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3],
 				&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2], rtc.day(), rtc.year());
 #else
-		sprintf(tDateString, "%s, %s %2hhu, 20%2hhu", sDayStrings[rtc.dayOfWeek() - 1],
+		sprintf(tDateString, "%s, %s %2u, 20%2u", sDayStrings[rtc.dayOfWeek() - 1],
 				sMonthStrings[rtc.month() - 1], rtc.day(), rtc.year());
 #endif
 	} else {
-		sprintf_P(tDateString, PSTR("%02hhu/%02hhu/20%2hhu"), rtc.month(), rtc.day(), rtc.year());
+		sprintf_P(tDateString, PSTR("%02u/%02u/20%2u"), rtc.month(), rtc.day(), rtc.year());
 	}
 	Serial.print(tDateString);
 }
@@ -245,11 +245,11 @@ void printRTCDateEuropeanFormat(bool aPrintLongFormat) {
 				&tDateString[sizeof(tDateString) - (DOW_MAX_STRING_SIZE + MONTH_MAX_STRING_SIZE) - 3], rtc.day(),
 				&tDateString[sizeof(tDateString) - (MONTH_MAX_STRING_SIZE) - 2], rtc.year());
 #else
-		sprintf(tDateString, "%s, %2hhu. %s 20%2hhu", sDayStrings[rtc.dayOfWeek() - 1], rtc.day(),
+		sprintf(tDateString, "%s, %2u. %s 20%2u", sDayStrings[rtc.dayOfWeek() - 1], rtc.day(),
 				sMonthStrings[rtc.month() - 1], rtc.year());
 #endif
 	} else {
-		sprintf_P(tDateString, PSTR("%02hhu.%02hhu.20%2hhu"), rtc.day(), rtc.month(), rtc.year());
+		sprintf_P(tDateString, PSTR("%02u.%02u.20%2u"), rtc.day(), rtc.month(), rtc.year());
 	}
 	Serial.print(tDateString);
 }
@@ -259,7 +259,7 @@ void printRTCDateISOFormat() {
 #if defined(__AVR__)
 	sprintf_P(tDateString, PSTR("20%2hhu-%02hhu-%02hhu"), rtc.year(), rtc.month(), rtc.day());
 #else
-	sprintf(tDateString, "20%2hhu-%02hhu-%02hhu", rtc.year(), rtc.month(), rtc.day());
+	sprintf(tDateString, "20%2u-%02u-%02u", rtc.year(), rtc.month(), rtc.day());
 #endif
 	Serial.print(tDateString);
 }
@@ -291,15 +291,14 @@ void printRTCTime(bool aPrintLongFormat, bool aDoRefresh) {
 	if (aPrintLongFormat) {
 		sprintf_P(tTimeString, PSTR("%02hhu:%02hhu:%02hhu"), rtc.hour(), rtc.minute(), rtc.second());
 	} else {
-		sprintf_P(tTimeString, PSTR("%02hhu:%02hhu"), rtc.hour(), rtc.minute());
+		sprintf_P(tTimeString, PSTR("%02u:%02u"), rtc.hour(), rtc.minute());
 	}
 #else
 	if (aPrintLongFormat) {
-		sprintf(tTimeString, "%02hhu:%02hhu:%02hhu", rtc.hour(), rtc.minute(), rtc.second());
+		sprintf(tTimeString, "%02u:%02u:%02u", rtc.hour(), rtc.minute(), rtc.second());
 	} else {
-		sprintf(tTimeString, "%02hhu:%02hhu", rtc.hour(), rtc.minute());
+		sprintf(tTimeString, "%02u:%02u", rtc.hour(), rtc.minute());
 	}
 #endif
 	Serial.print(tTimeString);
 }
-

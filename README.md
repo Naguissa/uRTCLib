@@ -30,11 +30,14 @@ For manual installation:
  * Rename to uRTCLib.zip
  * Install library on Arduino
 
-## Documentation ##
 
-You can find all documentation opening /doc/index.html
+
+## Documentation and extras ##
+
+You can find all documentation and extras in this repository: https://github.com/Naguissa/uRTCLib_doc_and_extras
 
 Due GitHub limitations HTML documentation is not avaliable online, you need to download the zip.
+
 
 
 ## Examples ##
