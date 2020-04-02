@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.4
+ * @version 6.2.6
  */
 
 #include <Arduino.h>
@@ -426,7 +426,7 @@ uint8_t uRTCLib::model() {
  * @param dayOfWeek day of week to set to HW RTC
  * @param dayOfMonth day of month to set to HW RTC
  * @param month month to set to HW RTC
- * @param year year to set to HW RTC
+ * @param year year to set to HW RTC in last 2 digits mode. As RTCs only support 19xx and 20xx years (see datasheets), it's harcoded to 20xx.
  */
 void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 	uRTCLIB_YIELD
@@ -437,7 +437,7 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 	Wire.write(uRTCLIB_decToBcd(hour)); // set hours
 	Wire.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
 	Wire.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
-	Wire.write(uRTCLIB_decToBcd(month)); // set month
+	Wire.write(uRTCLIB_decToBcd(0B10000000 | month)); // set month
 	Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
 	Wire.endTransmission();
 	uRTCLIB_YIELD

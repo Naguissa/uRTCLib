@@ -18,7 +18,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.4
+ * @version 6.2.6
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -57,9 +57,9 @@
 
 	/**
 	 * \brief Alarm 1 - Disabled
-	 * 
+	 *
 	 * Alarm1 structure:
-	 * 
+	 *
 	 * bit 0 - A1M1
 	 * bit 1 - A1M2
 	 * bit 2 - A1M3
@@ -103,9 +103,9 @@
 
 	/**
 	 * \brief Alarm 2 - Disabled
-	 * 
+	 *
 	 * Alarm1 structure:
-	 * 
+	 *
 	 * bit 0 - A2M1 - Unused, always 0
 	 * bit 1 - A2M2
 	 * bit 2 - A2M3
