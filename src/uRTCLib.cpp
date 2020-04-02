@@ -437,7 +437,7 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 	Wire.write(uRTCLIB_decToBcd(hour)); // set hours
 	Wire.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
 	Wire.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
-	Wire.write(uRTCLIB_decToBcd(0B10000000 | month)); // set month
+	Wire.write(0B10000000 | uRTCLIB_decToBcd(month)); // set month
 	Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
 	Wire.endTransmission();
 	uRTCLIB_YIELD
