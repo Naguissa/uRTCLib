@@ -99,7 +99,7 @@ void uRTCLib::refresh() {
 	uRTCLIB_YIELD
 	_day = uRTCLIB_bcdToDec(_day);
 
-	_month = Wire.read();
+	_month = Wire.read() & 0b00011111;
 	uRTCLIB_YIELD
 	_month = uRTCLIB_bcdToDec(_month);
 
