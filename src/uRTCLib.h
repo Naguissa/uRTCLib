@@ -18,7 +18,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.6
+ * @version 6.2.7
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -220,16 +220,25 @@
 	 */
 	#define uRTCLIB_bcdToDec(val) ((uint8_t) ((val / 16 * 10) + (val % 16)))
 
-	// ESP8266 yield function (ESP32 has no need for that)
+	// ESP yield function (ESP32 has no need for that on dual core, but it has on single core version)
 	#if ARDUINO_ARCH_ESP8266
-		#define uRTCLIB_YIELD yield();
-	#else
 		/**
-		 * \brief Only on ESP8266, yield to don't block ESP functionality.
+		 * \brief ESP8266, yield to don't block ESP functionality.
 		 *
 		 * When this library is used in other MCUs this is simply removed by the preprocessor
 		 */
-		#define uRTCLIB_YIELD
+		#define uRTCLIB_YIELD yield();
+	#else
+		#if ARDUINO_ARCH_ESP32
+		/**
+		 * \brief ESP32, yield to don't block ESP functionality.
+		 *
+		 * When this library is used in other MCUs this is simply removed by the preprocessor
+		 */
+			#define uRTCLIB_YIELD yield();
+		#else
+			#define uRTCLIB_YIELD
+		#endif
 	#endif
 
 	class uRTCLib {

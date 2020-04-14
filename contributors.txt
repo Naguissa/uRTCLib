@@ -7,3 +7,4 @@ Brian Park - https://github.com/bxparks - Temperature as fixed point to remove f
 Grepis - https://github.com/grepis - Find & fix some alarm bugs
 prosper00 - https://github.com/prosper00 - Find & fix a bug on a example when compiling for STM32 ST cube.
 meltingSnowdrift - https://github.com/meltingSnowdrift - Find unhandled centiry bit.
+David Brown - https://github.com/davidhbrown - Fix century bit on year read
