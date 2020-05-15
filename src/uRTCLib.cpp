@@ -238,16 +238,26 @@ void uRTCLib::refresh() {
 /**
  * \brief Returns lost power VBAT staus
  *
- * WARNING: DS1307 is known to not have it at a known address
+ * DS1307 has a 'CH' Clock Halt Bit in Register 00h -> On first application of power to the device the time and date registers are typically reset to 01/01/00  01  00:00:00  (MM/DD/YY  DOW  HH:MM:SS).
+ *                                                     The CH bit in the seconds register will be set to a 1.
+ * others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  *
  * @return True if power was lost (both power sources, VCC and VBAT)
  */
 bool uRTCLib::lostPower() {
-
+        uint8_t status;
 
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
-			return false;
+			uRTCLIB_YIELD
+			Wire.beginTransmission(_rtc_address);
+			Wire.write(0X00);
+			Wire.endTransmission();
+			uRTCLIB_YIELD
+			Wire.requestFrom(_rtc_address, 1);
+			status = Wire.read();
+			uRTCLIB_YIELD
+			return ((status & 0B10000000) == 0B10000000);
 			break;
 
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
@@ -259,7 +269,7 @@ bool uRTCLib::lostPower() {
 			Wire.endTransmission();
 			uRTCLIB_YIELD
 			Wire.requestFrom(_rtc_address, 1);
-			uint8_t status = Wire.read();
+			status = Wire.read();
 			uRTCLIB_YIELD
 			return ((status & 0B10000000) == 0B10000000);
 			break;
@@ -269,13 +279,32 @@ bool uRTCLib::lostPower() {
 /**
  * \brief Clears lost power VBAT staus
  *
- * WARNING: DS1307 is known to not have it at a known address
+ * DS1307 has a 'CH' Clock Halt Bit in Register 00h ->  When cleared to 0, the oscillator is enabled and time starts incermenting
+ * others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  */
 void uRTCLib::lostPowerClear() {
 
+        uint8_t status;
 
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
+			uRTCLIB_YIELD
+			Wire.beginTransmission(_rtc_address);
+			Wire.write(0X00);
+			Wire.endTransmission();
+			uRTCLIB_YIELD
+			Wire.requestFrom(_rtc_address, 1);
+			status = Wire.read();
+			status &= 0b01111111;
+			uRTCLIB_YIELD
+			Wire.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			Wire.write(0x00);
+			uRTCLIB_YIELD
+			Wire.write(status);
+			uRTCLIB_YIELD
+			Wire.endTransmission();
+			uRTCLIB_YIELD
 			break;
 
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
@@ -287,7 +316,7 @@ void uRTCLib::lostPowerClear() {
 			Wire.endTransmission();
 			uRTCLIB_YIELD
 			Wire.requestFrom(_rtc_address, 1);
-			uint8_t status = Wire.read();
+			status = Wire.read();
 			status &= 0b01111111;
 			uRTCLIB_YIELD
 			Wire.beginTransmission(_rtc_address);
