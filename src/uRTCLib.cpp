@@ -10,7 +10,7 @@
  *     * RAM for DS1307 and DS3232
  *     * temperature sensor for DS3231 and DS3232
  *     * Alarms (1 and 2) for DS3231 and DS3232
- *     * Power failure check for DS3231 and DS3232
+ *     * Power failure check and clear
  *
  * See uEEPROMLib for EEPROM support, https://github.com/Naguissa/uEEPROMLib
  *
@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.7
+ * @version 6.2.8
  */
 
 #include <Arduino.h>
@@ -238,9 +238,13 @@ void uRTCLib::refresh() {
 /**
  * \brief Returns lost power VBAT staus
  *
- * DS1307 has a 'CH' Clock Halt Bit in Register 00h -> On first application of power to the device the time and date registers are typically reset to 01/01/00  01  00:00:00  (MM/DD/YY  DOW  HH:MM:SS).
- *                                                     The CH bit in the seconds register will be set to a 1.
- * others have a 'OSF' Oscillator Stop Flag in Register 0Fh
+ * DS1307 has a 'CH' Clock Halt Bit in Register 00h.
+ *
+ * On first application of power to the device the time and date registers are typically reset to 01/01/00  01  00:00:00  (MM/DD/YY  DOW  HH:MM:SS).
+ *
+ * The CH bit in the seconds register will be set to a 1.
+ *
+ * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  *
  * @return True if power was lost (both power sources, VCC and VBAT)
  */
@@ -280,7 +284,8 @@ bool uRTCLib::lostPower() {
  * \brief Clears lost power VBAT staus
  *
  * DS1307 has a 'CH' Clock Halt Bit in Register 00h ->  When cleared to 0, the oscillator is enabled and time starts incermenting
- * others have a 'OSF' Oscillator Stop Flag in Register 0Fh
+ *
+ * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  */
 void uRTCLib::lostPowerClear() {
 

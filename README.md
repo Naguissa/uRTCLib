@@ -15,6 +15,7 @@ Supported features:
 * RAM for DS1307 and DS3232
 * temperature sensor for DS3231 and DS3232
 * Alarms (1 and 2) for DS3231 and DS3232
+* Power lost flag reading and clearing
 
 EEPROM support has been moved to https://github.com/Naguissa/uEEPROMLib
 

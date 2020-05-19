@@ -10,7 +10,7 @@
  *     * RAM for DS1307 and DS3232
  *     * temperature sensor for DS3231 and DS3232
  *     * Alarms (1 and 2) for DS3231 and DS3232
- *     * Power failure check for DS3231 and DS3232
+ *     * Power failure check and clear
  *
  * See uEEPROMLib for EEPROM support, https://github.com/Naguissa/uEEPROMLib
  *
@@ -18,7 +18,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.7
+ * @version 6.2.8
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
