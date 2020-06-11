@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.9
+ * @version 6.2.10
  */
 
 #include <Arduino.h>
@@ -411,6 +411,13 @@ uint8_t uRTCLib::year() {
  * \brief Returns actual Day Of Week
  *
  * @return Current stored Day Of Week
+ *   - #URTCLIB_WEEKDAY_SUNDAY
+ *   - #URTCLIB_WEEKDAY_MONDAY
+ *   - #URTCLIB_WEEKDAY_TUESDAY
+ *   - #URTCLIB_WEEKDAY_WEDNESDAY
+ *   - #URTCLIB_WEEKDAY_THURSDAY
+ *   - #URTCLIB_WEEKDAY_FRIDAY
+ *   - #URTCLIB_WEEKDAY_SATURDAY
  */
 uint8_t uRTCLib::dayOfWeek() {
 	return _dayOfWeek;
@@ -458,6 +465,13 @@ uint8_t uRTCLib::model() {
  * @param minute minute to set to HW RTC
  * @param hour hour to set to HW RTC
  * @param dayOfWeek day of week to set to HW RTC
+ *   - #URTCLIB_WEEKDAY_SUNDAY
+ *   - #URTCLIB_WEEKDAY_MONDAY
+ *   - #URTCLIB_WEEKDAY_TUESDAY
+ *   - #URTCLIB_WEEKDAY_WEDNESDAY
+ *   - #URTCLIB_WEEKDAY_THURSDAY
+ *   - #URTCLIB_WEEKDAY_FRIDAY
+ *   - #URTCLIB_WEEKDAY_SATURDAY
  * @param dayOfMonth day of month to set to HW RTC
  * @param month month to set to HW RTC
  * @param year year to set to HW RTC in last 2 digits mode. As RTCs only support 19xx and 20xx years (see datasheets), it's harcoded to 20xx.

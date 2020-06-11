@@ -18,7 +18,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.9
+ * @version 6.2.10
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -38,6 +38,7 @@
 	 */
 	#define URTCLIB_ADDRESS 0x68
 
+	/************	MODELS ***********/
 	/**
 	 * \brief Model definition, DS1307
 	 */
@@ -50,6 +51,38 @@
 	 * \brief Model definition, DS3232
 	 */
 	#define URTCLIB_MODEL_DS3232 3
+
+
+	/************	WEEK DAYS ***********/
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Sunday
+	 */
+	#define URTCLIB_WEEKDAY_SUNDAY 1
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Monday
+	 */
+	#define URTCLIB_WEEKDAY_MONDAY 2
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Tuesday
+	 */
+	#define URTCLIB_WEEKDAY_TUESDAY 3
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Wednesday
+	 */
+	#define URTCLIB_WEEKDAY_WEDNESDAY 4
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Thursday
+	 */
+	#define URTCLIB_WEEKDAY_THURSDAY 5
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Friday
+	 */
+	#define URTCLIB_WEEKDAY_FRIDAY 6
+	/**
+	 * \brief Week day definition, [Sun..Sat] as [1..7]. Saturday
+	 */
+	#define URTCLIB_WEEKDAY_SATURDAY 7
+
 
 
 	/************	ALARM SELECTION: ***********/
