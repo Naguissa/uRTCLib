@@ -336,6 +336,63 @@ void uRTCLib::lostPowerClear() {
 	}
 }
 
+
+
+/**
+  *\brief Enable VBAT operation when VCC power is lost.
+  *
+  * DS3231 should enable the battery by default on first power-up using VCC, however this sometimes 
+  * won't happen automatically, and therefore the Control Regsiter needs to be forcefully overwridden
+  * to set EOSC to 0. The devices are usually shipped from China with EOSC set to 1 to save battery 
+  * (even though they come with no battery included).
+  *
+  * Cause of frustration for a lot of first time users of the device. 
+  *   i.e. Time is lost even though battery present.
+  *
+  * Reference: https://forum.arduino.cc/index.php?topic=586520.msg3990086#msg3990086
+  *
+  * @return The value of the Control Register
+  */
+  
+uint8_t uRTCLib::enableBattery() {
+
+	uint8_t status = 0x00;
+
+	switch (_model) {
+		
+		case URTCLIB_MODEL_DS1307:
+		// TODO
+		break;
+	
+		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
+		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
+		default:
+		uRTCLIB_YIELD		
+		Wire.beginTransmission(_rtc_address);
+		uRTCLIB_YIELD
+		Wire.write(0x0E);
+		uRTCLIB_YIELD
+		Wire.write(0b00011100);
+		uRTCLIB_YIELD
+		Wire.endTransmission();
+		
+		// Return the status as a byte, to check against values of Control Register (0Eh)
+		uRTCLIB_YIELD		
+		Wire.beginTransmission(_rtc_address);
+		uRTCLIB_YIELD		
+		Wire.write(0x0E);		
+		uRTCLIB_YIELD
+		Wire.requestFrom(_rtc_address, 1);
+		uRTCLIB_YIELD
+		status =  Wire.read();
+		Wire.endTransmission();		
+
+		break;
+	}	
+		
+		return status;	
+}
+
 /**
  * \brief Returns actual temperature
  *
