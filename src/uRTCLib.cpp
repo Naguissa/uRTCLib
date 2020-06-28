@@ -342,7 +342,7 @@ void uRTCLib::lostPowerClear() {
   *\brief Enable VBAT operation when VCC power is lost.
   *
   * DS3231 should enable the battery by default on first power-up using VCC, however this sometimes 
-  * won't happen automatically, and therefore the Control Regsiter needs to be forcefully overwridden
+  * won't happen automatically, and therefore the Control Register needs to be forcefully overwritten
   * to set EOSC to 0. The devices are usually shipped from China with EOSC set to 1 to save battery 
   * (even though they come with no battery included).
   *
@@ -396,7 +396,7 @@ uint8_t uRTCLib::enableBattery() {
 /**
  * \brief Returns actual temperature
  *
- * Temperature is returned as degress * 100; i.e.: 3050 is 30.50º
+ * Temperature is returned as degrees * 100; i.e.: 3050 is 30.50º
  *
  * WARNING: DS1307 has no temperature register, so it always returns #URTCLIB_TEMP_ERROR
  *
