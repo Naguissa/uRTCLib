@@ -9,3 +9,4 @@ prosper00 - https://github.com/prosper00 - Find & fix a bug on a example when co
 meltingSnowdrift - https://github.com/meltingSnowdrift - Find unhandled centiry bit.
 David Brown - https://github.com/davidhbrown - Fix century bit on year read.
 WoBo68 - https://github.com/WoBo68 - Power lost support for DS1307.
+mrfaptastic - https://github.com/mrfaptastic - enableBattery support (DS3231 and DS3232)

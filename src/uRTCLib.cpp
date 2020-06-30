@@ -14,6 +14,9 @@
  *
  * See uEEPROMLib for EEPROM support, https://github.com/Naguissa/uEEPROMLib
  *
+ * Note: For AtTiny you need TinyWireM library from Adafruit installed (available on library manager).
+ *
+ *
  * @file uRTCLib.cpp
  * @copyright Naguissa
  * @author Naguissa
@@ -21,11 +24,19 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.10
+ * @version 6.3.0
  */
 
 #include <Arduino.h>
-#include <Wire.h>
+#ifndef URTCLIB_WIRE
+	#if defined(ARDUINO_attiny) || defined(ARDUINO_AVR_ATTINYX4) || defined(ARDUINO_AVR_ATTINYX5) || defined(ARDUINO_AVR_ATTINYX7) || defined(ARDUINO_AVR_ATTINYX8) || defined(ARDUINO_AVR_ATTINYX61) || defined(ARDUINO_AVR_ATTINY43) || defined(ARDUINO_AVR_ATTINY828) || defined(ARDUINO_AVR_ATTINY1634) || defined(ARDUINO_AVR_ATTINYX313)
+		#include <TinyWireM.h>                  // I2C Master lib for ATTinys which use USI
+		#define URTCLIB_WIRE TinyWireM
+	#else
+		#include <Wire.h>
+		#define URTCLIB_WIRE Wire
+	#endif
+#endif
 #include "uRTCLib.h"
 
 /**
@@ -61,49 +72,49 @@ uRTCLib::uRTCLib(const int rtc_address, const uint8_t model) {
  */
 void uRTCLib::refresh() {
 	uRTCLIB_YIELD
-	Wire.beginTransmission(_rtc_address);
-	Wire.write(0); // set DS3231 register pointer to 00h
-	Wire.endTransmission();
+	URTCLIB_WIRE.beginTransmission(_rtc_address);
+	URTCLIB_WIRE.write(0); // set DS3231 register pointer to 00h
+	URTCLIB_WIRE.endTransmission();
 	uRTCLIB_YIELD
 
 	// Adjust requested bytes to selected model:
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
-			Wire.requestFrom(_rtc_address, 8);
+			URTCLIB_WIRE.requestFrom(_rtc_address, 8);
 			break;
 
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
-			Wire.requestFrom(_rtc_address, 15);
+			URTCLIB_WIRE.requestFrom(_rtc_address, 15);
 			break;
 	}
 
-	_second = Wire.read() & 0b01111111;
+	_second = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
 	_second = uRTCLIB_bcdToDec(_second);
 
-	_minute = Wire.read() & 0b01111111;
+	_minute = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
 	_minute = uRTCLIB_bcdToDec(_minute);
 
-	_hour = Wire.read() & 0b00111111;
+	_hour = URTCLIB_WIRE.read() & 0b00111111;
 	uRTCLIB_YIELD
 	_hour = uRTCLIB_bcdToDec(_hour);
 
-	_dayOfWeek = Wire.read();
+	_dayOfWeek = URTCLIB_WIRE.read();
 	uRTCLIB_YIELD
 	_dayOfWeek = uRTCLIB_bcdToDec(_dayOfWeek);
 
-	_day = Wire.read();
+	_day = URTCLIB_WIRE.read();
 	uRTCLIB_YIELD
 	_day = uRTCLIB_bcdToDec(_day);
 
-	_month = Wire.read() & 0b00011111;
+	_month = URTCLIB_WIRE.read() & 0b00011111;
 	uRTCLIB_YIELD
 	_month = uRTCLIB_bcdToDec(_month);
 
-	_year = Wire.read();
+	_year = URTCLIB_WIRE.read();
 	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
 
@@ -113,7 +124,7 @@ void uRTCLib::refresh() {
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uint8_t status;
-			status = Wire.read();
+			status = URTCLIB_WIRE.read();
 			if (status & 0b00010000) {
 				_sqwg_mode = status & 0b10000000 ? URTCLIB_SQWG_OFF_1 : URTCLIB_SQWG_OFF_0;
 			} else {
@@ -146,23 +157,23 @@ void uRTCLib::refresh() {
 			_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 			_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 
-			_a1_second = Wire.read();
+			_a1_second = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_second & 0b10000000) >> 7);
 			_a1_second = uRTCLIB_bcdToDec((_a1_second & 0b01111111));   //parentheses for bitwise operation as argument for uRTCLIB_bcdToDec is required
 																		//otherwise wrong result will be returned by function
 
-			_a1_minute = Wire.read();
+			_a1_minute = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_minute & 0b10000000) >> 6);
 			_a1_minute = uRTCLIB_bcdToDec((_a1_minute & 0b01111111));
 
-			_a1_hour = Wire.read();
+			_a1_hour = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_hour & 0b10000000) >> 5);
 			_a1_hour = uRTCLIB_bcdToDec((_a1_hour & 0b00111111));
 
-			_a1_day_dow = Wire.read();
+			_a1_day_dow = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 4);
 			if (!(_a1_mode & 0b00001111)) {
@@ -171,19 +182,19 @@ void uRTCLib::refresh() {
 			_a1_day_dow = _a1_day_dow & 0b00111111;
 			_a1_day_dow = uRTCLIB_bcdToDec(_a1_day_dow);
 
-			_a2_minute = Wire.read();
+			_a2_minute = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_minute & 0b10000000) >> 6);
 			_a2_minute = _a2_minute & 0b01111111;
 			_a2_minute = uRTCLIB_bcdToDec(_a2_minute);
 
-			_a2_hour = Wire.read();
+			_a2_hour = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_hour & 0b10000000) >> 5);
 			_a2_hour = _a2_hour & 0b00111111;
 			_a2_hour = uRTCLIB_bcdToDec(_a2_hour);
 
-			_a2_day_dow = Wire.read();
+			_a2_day_dow = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_day_dow & 0b10000000) >> 4);
 			if (!(_a2_mode & 0b00001110)) { // M4-M2 is 0, check DT/DY
@@ -193,7 +204,7 @@ void uRTCLib::refresh() {
 
 
 			// Control registers
-			LSB = Wire.read();
+			LSB = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 
 			if (LSB & 0b00000100) {
@@ -217,14 +228,14 @@ void uRTCLib::refresh() {
 			}
 
 			// Temperature registers (11h-12h) get updated automatically every 64s
-			Wire.beginTransmission(_rtc_address);
-			Wire.write(0x11);
-			Wire.endTransmission();
-			Wire.requestFrom(_rtc_address, 2);
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0x11);
+			URTCLIB_WIRE.endTransmission();
+			URTCLIB_WIRE.requestFrom(_rtc_address, 2);
 			uRTCLIB_YIELD
 
-			MSB = Wire.read(); //2's complement int portion
-			LSB = Wire.read(); //fraction portion
+			MSB = URTCLIB_WIRE.read(); //2's complement int portion
+			LSB = URTCLIB_WIRE.read(); //fraction portion
 			_temp = 0b0000000000000000 | (MSB  << 2) | (LSB >> 6); // 8+2 bits, *25 is the same as number + 2bitdecimals * 100 in base 10
 			if (MSB & 0b10000000) {
 				_temp = (_temp | 0b1111110000000000);
@@ -254,12 +265,12 @@ bool uRTCLib::lostPower() {
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uRTCLIB_YIELD
-			Wire.beginTransmission(_rtc_address);
-			Wire.write(0X00);
-			Wire.endTransmission();
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0X00);
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
-			Wire.requestFrom(_rtc_address, 1);
-			status = Wire.read();
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			return ((status & 0B10000000) == 0B10000000);
 			break;
@@ -268,12 +279,12 @@ bool uRTCLib::lostPower() {
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
 			uRTCLIB_YIELD
-			Wire.beginTransmission(_rtc_address);
-			Wire.write(0X0F);
-			Wire.endTransmission();
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0X0F);
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
-			Wire.requestFrom(_rtc_address, 1);
-			status = Wire.read();
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			return ((status & 0B10000000) == 0B10000000);
 			break;
@@ -294,21 +305,21 @@ void uRTCLib::lostPowerClear() {
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uRTCLIB_YIELD
-			Wire.beginTransmission(_rtc_address);
-			Wire.write(0X00);
-			Wire.endTransmission();
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0X00);
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
-			Wire.requestFrom(_rtc_address, 1);
-			status = Wire.read();
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
 			status &= 0b01111111;
 			uRTCLIB_YIELD
-			Wire.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
-			Wire.write(0x00);
+			URTCLIB_WIRE.write(0x00);
 			uRTCLIB_YIELD
-			Wire.write(status);
+			URTCLIB_WIRE.write(status);
 			uRTCLIB_YIELD
-			Wire.endTransmission();
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
 			break;
 
@@ -316,21 +327,21 @@ void uRTCLib::lostPowerClear() {
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
 			uRTCLIB_YIELD
-			Wire.beginTransmission(_rtc_address);
-			Wire.write(0X0F);
-			Wire.endTransmission();
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0X0F);
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
-			Wire.requestFrom(_rtc_address, 1);
-			status = Wire.read();
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
 			status &= 0b01111111;
 			uRTCLIB_YIELD
-			Wire.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
-			Wire.write(0x0F);
+			URTCLIB_WIRE.write(0x0F);
 			uRTCLIB_YIELD
-			Wire.write(status);
+			URTCLIB_WIRE.write(status);
 			uRTCLIB_YIELD
-			Wire.endTransmission();
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
 			break;
 	}
@@ -341,56 +352,110 @@ void uRTCLib::lostPowerClear() {
 /**
   *\brief Enable VBAT operation when VCC power is lost.
   *
-  * DS3231 should enable the battery by default on first power-up using VCC, however this sometimes 
+  * DS3231/DS3232 should enable the battery by default on first power-up using VCC, however this sometimes
   * won't happen automatically, and therefore the Control Register needs to be forcefully overwritten
-  * to set EOSC to 0. The devices are usually shipped from China with EOSC set to 1 to save battery 
+  * to set EOSC to 0. The devices are usually shipped from China with EOSC set to 1 to save battery
   * (even though they come with no battery included).
   *
-  * Cause of frustration for a lot of first time users of the device. 
+  * Cause of frustration for a lot of first time users of the device.
   *   i.e. Time is lost even though battery present.
   *
   * Reference: https://forum.arduino.cc/index.php?topic=586520.msg3990086#msg3990086
   *
-  * @return The value of the Control Register
+  * @return True on success
   */
-  
-uint8_t uRTCLib::enableBattery() {
-
-	uint8_t status = 0x00;
-
+bool uRTCLib::enableBattery() {
 	switch (_model) {
-		
-		case URTCLIB_MODEL_DS1307:
-		// TODO
-		break;
-	
+
+		case URTCLIB_MODEL_DS1307: // Not available
+			// No EOSC register here, always connected, so we return true
+			return true;
+			break;
+
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
-		uRTCLIB_YIELD		
-		Wire.beginTransmission(_rtc_address);
-		uRTCLIB_YIELD
-		Wire.write(0x0E);
-		uRTCLIB_YIELD
-		Wire.write(0b00011100);
-		uRTCLIB_YIELD
-		Wire.endTransmission();
-		
-		// Return the status as a byte, to check against values of Control Register (0Eh)
-		uRTCLIB_YIELD		
-		Wire.beginTransmission(_rtc_address);
-		uRTCLIB_YIELD		
-		Wire.write(0x0E);		
-		uRTCLIB_YIELD
-		Wire.requestFrom(_rtc_address, 1);
-		uRTCLIB_YIELD
-		status =  Wire.read();
-		Wire.endTransmission();		
+			uint8_t status;
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0x0E);
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
+			status &= 0b01111111;
+			uRTCLIB_YIELD
 
-		break;
-	}	
-		
-		return status;	
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(status);
+
+			// Return the status bit as a bool, to check against values of Control Register (0Eh)
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			uRTCLIB_YIELD
+			status =  URTCLIB_WIRE.read();
+			status &= 0b10000000;
+			return (status == 0b00000000);
+			break;
+	}
+
+	// Never should get here, so we return false
+	return false;
+}
+
+/**
+  *\brief Disable VBAT operation when VCC power is lost.
+  *
+  *
+  * @return True on success
+  */
+bool uRTCLib::disableBattery() {
+	switch (_model) {
+
+		case URTCLIB_MODEL_DS1307: // Not available
+			// No EOSC register here, always connected, so we return false (at the end)
+			break;
+
+		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
+		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
+		default:
+			uint8_t status;
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0x0E);
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
+			status |= 0b10000000;
+			uRTCLIB_YIELD
+
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(status);
+
+			// Return the status bit as a bool, to check against values of Control Register (0Eh)
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			uRTCLIB_YIELD
+			status =  URTCLIB_WIRE.read();
+			status &= 0b10000000;
+			return (status == 0b10000000);
+			break;
+	}
+
+	return false;
 }
 
 /**
@@ -535,31 +600,31 @@ uint8_t uRTCLib::model() {
  */
 void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour, const uint8_t dayOfWeek, const uint8_t dayOfMonth, const uint8_t month, const uint8_t year) {
 	uRTCLIB_YIELD
-	Wire.beginTransmission(_rtc_address);
-	Wire.write(0); // set next input to start at the seconds register
-	Wire.write(uRTCLIB_decToBcd(second)); // set seconds
-	Wire.write(uRTCLIB_decToBcd(minute)); // set minutes
-	Wire.write(uRTCLIB_decToBcd(hour)); // set hours
-	Wire.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
-	Wire.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
-	Wire.write(0B10000000 | uRTCLIB_decToBcd(month)); // set month
-	Wire.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
-	Wire.endTransmission();
+	URTCLIB_WIRE.beginTransmission(_rtc_address);
+	URTCLIB_WIRE.write(0); // set next input to start at the seconds register
+	URTCLIB_WIRE.write(uRTCLIB_decToBcd(second)); // set seconds
+	URTCLIB_WIRE.write(uRTCLIB_decToBcd(minute)); // set minutes
+	URTCLIB_WIRE.write(uRTCLIB_decToBcd(hour)); // set hours
+	URTCLIB_WIRE.write(uRTCLIB_decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
+	URTCLIB_WIRE.write(uRTCLIB_decToBcd(dayOfMonth)); // set date (1 to 31)
+	URTCLIB_WIRE.write(0B10000000 | uRTCLIB_decToBcd(month)); // set month
+	URTCLIB_WIRE.write(uRTCLIB_decToBcd(year)); // set year (0 to 99)
+	URTCLIB_WIRE.endTransmission();
 	uRTCLIB_YIELD
 	//
-	Wire.beginTransmission(_rtc_address);
-	Wire.write(0X0F);
-	Wire.endTransmission();
+	URTCLIB_WIRE.beginTransmission(_rtc_address);
+	URTCLIB_WIRE.write(0X0F);
+	URTCLIB_WIRE.endTransmission();
 	uRTCLIB_YIELD
 	/* flip OSF bit --> Disabled, use lostPowerClear instead.
-	Wire.requestFrom(_rtc_address, 1);
-	uint8_t statreg = Wire.read();
+	URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+	uint8_t statreg = URTCLIB_WIRE.read();
 	statreg &= ~0x80;
 	uRTCLIB_YIELD
-	Wire.beginTransmission(_rtc_address);
-	Wire.write(0X0F);
-	Wire.write((byte)statreg);
-	Wire.endTransmission();
+	URTCLIB_WIRE.beginTransmission(_rtc_address);
+	URTCLIB_WIRE.write(0X0F);
+	URTCLIB_WIRE.write((byte)statreg);
+	URTCLIB_WIRE.endTransmission();
 	*/
 }
 
@@ -606,83 +671,83 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 		ret = true;
 
 		// Disable Alarm:
-		Wire.beginTransmission(_rtc_address);
+		URTCLIB_WIRE.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
-		Wire.write(0x0E);
+		URTCLIB_WIRE.write(0x0E);
 		uRTCLIB_YIELD
-		Wire.endTransmission();
+		URTCLIB_WIRE.endTransmission();
 		uRTCLIB_YIELD
-		Wire.requestFrom(_rtc_address, 1);
-		status = Wire.read();
+		URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+		status = URTCLIB_WIRE.read();
 		status &= 0b11111110;
-		Wire.beginTransmission(_rtc_address);
+		URTCLIB_WIRE.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
-		Wire.write(0x0E);
+		URTCLIB_WIRE.write(0x0E);
 		uRTCLIB_YIELD
-		Wire.write(status);
+		URTCLIB_WIRE.write(status);
 		uRTCLIB_YIELD
-		Wire.endTransmission();
+		URTCLIB_WIRE.endTransmission();
 		uRTCLIB_YIELD
 		_a1_mode = type;
 	} else if (type == URTCLIB_ALARM_TYPE_2_NONE) {
 		ret = true;
 
 		// Disable Alarm:
-		Wire.beginTransmission(_rtc_address);
+		URTCLIB_WIRE.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
-		Wire.write(0x0E);
+		URTCLIB_WIRE.write(0x0E);
 		uRTCLIB_YIELD
-		Wire.endTransmission();
+		URTCLIB_WIRE.endTransmission();
 		uRTCLIB_YIELD
-		Wire.requestFrom(_rtc_address, 1);
-		status = Wire.read();
+		URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+		status = URTCLIB_WIRE.read();
 		status &= 0b11111101;
-		Wire.beginTransmission(_rtc_address);
+		URTCLIB_WIRE.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
-		Wire.write(0x0E);
+		URTCLIB_WIRE.write(0x0E);
 		uRTCLIB_YIELD
-		Wire.write(status);
+		URTCLIB_WIRE.write(status);
 		uRTCLIB_YIELD
-		Wire.endTransmission();
+		URTCLIB_WIRE.endTransmission();
 		uRTCLIB_YIELD
 		_a2_mode = type;
 	} else {
 		switch (type & 0b10000000) {
 			case 0b00000000: // Alarm 1
 				ret = true;
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x07); // set next input to start at the seconds register
+				URTCLIB_WIRE.write(0x07); // set next input to start at the seconds register
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(second) & 0b01111111) | ((type & 0b00000001) << 7)); // set seconds & mode/bit1
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(second) & 0b01111111) | ((type & 0b00000001) << 7)); // set seconds & mode/bit1
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit2
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit2
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit3
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit3
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001000) << 4) | ((type & 0b00010000) << 2)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001000) << 4) | ((type & 0b00010000) << 2)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 
 				// Enable Alarm:
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				Wire.requestFrom(_rtc_address, 1);
+				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 				uRTCLIB_YIELD
-				status = Wire.read();
+				status = URTCLIB_WIRE.read();
 				status = status | 0b00000101;  // INTCN and A1IE bits
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.write(status);
+				URTCLIB_WIRE.write(status);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 
 				_a1_mode = type;
@@ -696,37 +761,37 @@ bool uRTCLib::alarmSet(const uint8_t type, const uint8_t second, const uint8_t m
 
 			case 0b10000000: // Alarm 2
 				ret = true;
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0B); // set next input to start at the minutes register
+				URTCLIB_WIRE.write(0x0B); // set next input to start at the minutes register
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit2
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(minute) & 0b01111111) | ((type & 0b00000010) << 6)); // set minutes & mode/bit2
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit3
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(hour) & 0b00111111) | ((type & 0b00000100) << 5)); // set hours & mode/bit3
 				uRTCLIB_YIELD
-				Wire.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001000) << 4) | ((type & 0b00010000) << 2)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
+				URTCLIB_WIRE.write((uRTCLIB_decToBcd(day_dow) & 0b00111111) | ((type & 0b00001000) << 4) | ((type & 0b00010000) << 2)); // set date / day of week (1=Sunday, 7=Saturday)  & mode/bit4 & mode/DY-DT (bit3)
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 
 				// Enable Alarm:
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				Wire.requestFrom(_rtc_address, 1);
+				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 				uRTCLIB_YIELD
-				status = Wire.read();
+				status = URTCLIB_WIRE.read();
 				status = status | 0b00000110;  // INTCN and A2IE bits
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.write(status);
+				URTCLIB_WIRE.write(status);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 
 				_a2_mode = type;
@@ -774,22 +839,22 @@ bool uRTCLib::alarmDisable(const uint8_t alarm) {
 			} // Alarm type switch
 			if (mask) {
 				// Disable Alarm:
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				Wire.requestFrom(_rtc_address, 1);
-				status = Wire.read();
+				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+				status = URTCLIB_WIRE.read();
 				status &= 0b11111110;  // A1IE bit
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.write(status);
+				URTCLIB_WIRE.write(status);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 				_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 				return true;
@@ -830,22 +895,22 @@ bool uRTCLib::alarmClearFlag(const uint8_t alarm) {
 			} // Alarm type switch
 			if (mask) {
 				// Clear Alarm Flag:
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0F);
+				URTCLIB_WIRE.write(0x0F);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				Wire.requestFrom(_rtc_address, 1);
-				status = Wire.read();
+				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+				status = URTCLIB_WIRE.read();
 				status &= mask;  // A?F bit
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0F);
+				URTCLIB_WIRE.write(0x0F);
 				uRTCLIB_YIELD
-				Wire.write(status);
+				URTCLIB_WIRE.write(status);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 				return true;
 			}
@@ -1088,22 +1153,22 @@ bool uRTCLib::sqwgSetMode(const uint8_t mode) {
 			} // mode switch
 
 			if (processAnd || processOr) { // Any bit change?
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x07);
+				URTCLIB_WIRE.write(0x07);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				Wire.requestFrom(_rtc_address, 1);
-				status = Wire.read();
+				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+				status = URTCLIB_WIRE.read();
 				status = (status & processAnd) | processOr;
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x07);
+				URTCLIB_WIRE.write(0x07);
 				uRTCLIB_YIELD
-				Wire.write(status);
+				URTCLIB_WIRE.write(status);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 				_sqwg_mode = mode;
 				return true;
@@ -1142,22 +1207,22 @@ bool uRTCLib::sqwgSetMode(const uint8_t mode) {
 			} // mode switch
 
 			if (processAnd || processOr) { // Any bit change?
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				Wire.requestFrom(_rtc_address, 1);
-				status = Wire.read();
+				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+				status = URTCLIB_WIRE.read();
 				status = (status & processAnd) | processOr;
-				Wire.beginTransmission(_rtc_address);
+				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
-				Wire.write(0x0E);
+				URTCLIB_WIRE.write(0x0E);
 				uRTCLIB_YIELD
-				Wire.write(status);
+				URTCLIB_WIRE.write(status);
 				uRTCLIB_YIELD
-				Wire.endTransmission();
+				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
 				_sqwg_mode = mode;
 				if (mode == URTCLIB_SQWG_OFF_1 || mode == URTCLIB_SQWG_OFF_0) {
@@ -1216,15 +1281,15 @@ byte uRTCLib::ramRead(const uint8_t address) {
 			break;
 	}
 	if (offset != 0xff) {
-		Wire.beginTransmission(_rtc_address);
+		URTCLIB_WIRE.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
-		Wire.write(address + offset);
+		URTCLIB_WIRE.write(address + offset);
 		uRTCLIB_YIELD
-		Wire.endTransmission();
+		URTCLIB_WIRE.endTransmission();
 		uRTCLIB_YIELD
-		Wire.requestFrom(_rtc_address, 1);
+		URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 		uRTCLIB_YIELD
-		return Wire.read();
+		return URTCLIB_WIRE.read();
 	}
 	return 0xff;
 }
@@ -1254,13 +1319,13 @@ bool uRTCLib::ramWrite(const uint8_t address, byte data) {
 			break;
 	}
 	if (offset != 0xff) {
-		Wire.beginTransmission(_rtc_address);
+		URTCLIB_WIRE.beginTransmission(_rtc_address);
 		uRTCLIB_YIELD
-		Wire.write(address + offset);
+		URTCLIB_WIRE.write(address + offset);
 		uRTCLIB_YIELD
-		Wire.write(data);
+		URTCLIB_WIRE.write(data);
 		uRTCLIB_YIELD
-		Wire.endTransmission();
+		URTCLIB_WIRE.endTransmission();
 		uRTCLIB_YIELD
 		return true;
 	}

@@ -20,7 +20,6 @@
  * @email naguissa@foroelectro.net
  */
 #include "Arduino.h"
-#include "Wire.h"
 #include "uRTCLib.h"
 
 uRTCLib rtc;
@@ -110,11 +109,12 @@ void setup() {
 		  // Just to know which program is running on my Arduino
 	Serial.println(F("START " __FILE__ "\r\nVersion " VERSION_EXAMPLE " from " __DATE__));
 
-#ifdef ARDUINO_ARCH_ESP8266
-		Wire.begin(0, 2); // D3 and D4 on ESP8266
+	#ifdef ARDUINO_ARCH_ESP8266
+		URTCLIB_WIRE.begin(0, 2); // D3 and D4 on ESP8266
 	#else
-	Wire.begin();
-#endif
+		URTCLIB_WIRE.begin();
+	#endif
+
 	rtc.set_rtc_address(0x68);
 	rtc.set_model(URTCLIB_MODEL_DS3232);
 

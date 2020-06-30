@@ -20,7 +20,6 @@
  * @email naguissa@foroelectro.net
  */
 #include "Arduino.h"
-#include "Wire.h"
 #include "uRTCLib.h"
 
 
@@ -34,9 +33,9 @@ delay (2000);
 	//  Max position: 32767
 
 	#ifdef ARDUINO_ARCH_ESP8266
-		Wire.begin(0, 2); // D3 and D4 on ESP8266
+		URTCLIB_WIRE.begin(0, 2); // D3 and D4 on ESP8266
 	#else
-		Wire.begin();
+		URTCLIB_WIRE.begin();
 	#endif
 
 	// Only used once, then disabled

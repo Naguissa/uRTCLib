@@ -44,7 +44,6 @@
  * @email naguissa@foroelectro.net
  */
 #include "Arduino.h"
-#include "Wire.h"
 #include "uRTCLib.h"
 
 #if defined(__AVR_ATmega32U4__) || defined(ARDUINO_ARCH_AVR)
@@ -68,9 +67,9 @@ delay (2000);
 
 	#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32) || defined(__AVR_ATmega32U4__) || defined(ARDUINO_ARCH_AVR)
 		#ifdef ARDUINO_ARCH_ESP8266
-			Wire.begin(0, 2); // D3 and D4 on ESP8266
+			URTCLIB_WIRE.begin(0, 2); // D3 and D4 on ESP8266
 		#else
-			Wire.begin();
+			URTCLIB_WIRE.begin();
 		#endif
 
 		#ifdef ARDUINO_ARCH_ESP32

@@ -20,7 +20,6 @@
  * @email naguissa@foroelectro.net
  */
 #include "Arduino.h"
-#include "Wire.h"
 #include "uRTCLib.h"
 
 
@@ -35,9 +34,9 @@ delay (2000);
 	//  Max position: 32767
 
 	#ifdef ARDUINO_ARCH_ESP8266
-		Wire.begin(0, 2); // D3 and D4 on ESP8266
+		URTCLIB_WIRE.begin(0, 2); // D3 and D4 on ESP8266
 	#else
-		Wire.begin();
+		URTCLIB_WIRE.begin();
 	#endif
 	rtc.set_rtc_address(0x68);
 	rtc.set_model(URTCLIB_MODEL_DS3232);
@@ -45,6 +44,12 @@ delay (2000);
 	// Only used once, then disabled
 	rtc.set(0, 42, 16, 6, 2, 5, 15);
 	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
+
+	if (rtc.enableBattery()) {
+		Serial.println("Battery activated correctly.");
+	} else {
+		Serial.println("ERROR activating battery.");
+	}
 
 	Serial.print("Lost power status: ");
 	if (rtc.lostPower()) {

@@ -14,11 +14,14 @@
  *
  * See uEEPROMLib for EEPROM support, https://github.com/Naguissa/uEEPROMLib
  *
+ * Note: For AtTiny you need TinyWireM library from Adafruit installed (available on library manager).
+ *
+ *
  * @see <a href="https://github.com/Naguissa/uRTCLib">https://github.com/Naguissa/uRTCLib</a>
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.2.10
+ * @version 6.3.0
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -29,7 +32,15 @@
 	 */
 	#define URTCLIB
 	#include "Arduino.h"
-	#include "Wire.h"
+	#ifndef URTCLIB_WIRE
+		#if defined(ARDUINO_attiny) || defined(ARDUINO_AVR_ATTINYX4) || defined(ARDUINO_AVR_ATTINYX5) || defined(ARDUINO_AVR_ATTINYX7) || defined(ARDUINO_AVR_ATTINYX8) || defined(ARDUINO_AVR_ATTINYX61) || defined(ARDUINO_AVR_ATTINY43) || defined(ARDUINO_AVR_ATTINY828) || defined(ARDUINO_AVR_ATTINY1634) || defined(ARDUINO_AVR_ATTINYX313)
+			#include <TinyWireM.h>                  // I2C Master lib for ATTinys which use USI
+			#define URTCLIB_WIRE TinyWireM
+		#else
+			#include <Wire.h>
+			#define URTCLIB_WIRE Wire
+		#endif
+	#endif
 
 	/**
 	 * \brief Default RTC I2C address
@@ -296,10 +307,12 @@
 			void set_model(const uint8_t);
 			uint8_t model();
 
-			/******* Lost power ********/
+			/******* Power ********/
 			bool lostPower();
 			void lostPowerClear();
-			uint8_t enableBattery();
+			bool enableBattery(); // Only DS3231 and DS3232.
+			bool disableBattery();
+
 
 			/******** Alarms ************/
 			bool alarmSet(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t); // Seconds will be ignored on Alarm 2
