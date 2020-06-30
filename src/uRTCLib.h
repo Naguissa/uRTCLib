@@ -299,6 +299,7 @@
 			/******* Lost power ********/
 			bool lostPower();
 			void lostPowerClear();
+			uint8_t enableBattery();
 
 			/******** Alarms ************/
 			bool alarmSet(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t); // Seconds will be ignored on Alarm 2
