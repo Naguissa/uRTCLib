@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.3.0
+ * @version 6.4.0
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -335,6 +335,12 @@
 			// DS3232: Addresses 14h to FFh so we offset 14h positions and limit to EBh as maximum address
 			byte ramRead(const uint8_t);
 			bool ramWrite(const uint8_t, byte);
+
+			/************ Aging *************/
+			// Only DS3231 and DS3232. Address 0x10h
+			int8_t agingGet();
+			bool agingSet(int8_t);
+
 
 		private:
 			// Address

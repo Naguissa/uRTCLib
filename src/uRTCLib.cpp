@@ -24,7 +24,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.3.0
+ * @version 6.4.0
  */
 
 #include <Arduino.h>
@@ -118,7 +118,7 @@ void uRTCLib::refresh() {
 	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
 
-	_temp = 9999; // Some obvious error value
+	_temp = URTCLIB_TEMP_ERROR; // Some obvious error value
 
 	// Now we need to read extra requested bytes depending on the RTC model again:
 	switch (_model) {
@@ -1330,6 +1330,89 @@ bool uRTCLib::ramWrite(const uint8_t address, byte data) {
 		return true;
 	}
 	return false;
+}
+
+
+
+/**
+ * \brief Reads actual aging value on the RTC
+ *
+ * @return Aging register value on RTC, 2-complement recalculated (use as regular int8_t)
+ */
+int8_t uRTCLib::agingGet() {
+	int8_t ret = 0;
+	switch (_model) {
+		case URTCLIB_MODEL_DS3231:
+		case URTCLIB_MODEL_DS3232:
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x10);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			uRTCLIB_YIELD
+			ret = URTCLIB_WIRE.read(); //2's complement portion
+			if (ret & 0b10000000) {
+				ret--;
+			}
+			break;
+
+	}
+	return ret;
+}
+
+/**
+ * \brief Sets aging value on the RTC
+ *
+ * @param val new value (use as regular int8_t, 2-complement conversion is done internally)
+ *
+ * @return True when executed, false if RTC doesn't support it.
+ */
+bool uRTCLib::agingSet(int8_t val) {
+	bool ret = false;
+	switch (_model) {
+		case URTCLIB_MODEL_DS3231:
+		case URTCLIB_MODEL_DS3232:
+			if (val < 0) {
+				val++;
+			}
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x10);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(val);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+
+			ret = true;
+
+			// Read status register 0x0E
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			uRTCLIB_YIELD
+			byte status = URTCLIB_WIRE.read();
+			uRTCLIB_YIELD
+
+			// Enable CONV bit on status register 0x0E to apply changes inmediately
+			status |= 0b00100000;
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(status);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+
+	}
+	return ret;
 }
 
 

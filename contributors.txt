@@ -10,3 +10,4 @@ meltingSnowdrift - https://github.com/meltingSnowdrift - Find unhandled centiry 
 David Brown - https://github.com/davidhbrown - Fix century bit on year read.
 WoBo68 - https://github.com/WoBo68 - Power lost support for DS1307.
 mrfaptastic - https://github.com/mrfaptastic - enableBattery support (DS3231 and DS3232)
+Eleksir - https://github.com/eleksir - DS3231 and DS3232 aging factor register get/set

@@ -61,6 +61,12 @@ delay (2000);
 	}
 
 
+	Serial.print("Aging register value: ");
+	Serial.println(rtc.agingGet());
+
+	Serial.println("Not changing aging register value. To do so you can execute: rtc.agingSet(newValue)");
+
+
 	Serial.println("Testing SQWG/INT output:");
 
 	Serial.println("fixed 0:");
