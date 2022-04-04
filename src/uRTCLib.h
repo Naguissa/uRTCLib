@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.4.0
+ * @version 6.5.0
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -66,33 +66,33 @@
 
 	/************	WEEK DAYS ***********/
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Sunday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Sunday
 	 */
-	#define URTCLIB_WEEKDAY_SUNDAY 1
+	#define URTCLIB_WEEKDAY_SUNDAY 7
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Monday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Monday
 	 */
-	#define URTCLIB_WEEKDAY_MONDAY 2
+	#define URTCLIB_WEEKDAY_MONDAY 1
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Tuesday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Tuesday
 	 */
-	#define URTCLIB_WEEKDAY_TUESDAY 3
+	#define URTCLIB_WEEKDAY_TUESDAY 2
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Wednesday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Wednesday
 	 */
-	#define URTCLIB_WEEKDAY_WEDNESDAY 4
+	#define URTCLIB_WEEKDAY_WEDNESDAY 3
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Thursday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Thursday
 	 */
-	#define URTCLIB_WEEKDAY_THURSDAY 5
+	#define URTCLIB_WEEKDAY_THURSDAY 4
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Friday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Friday
 	 */
-	#define URTCLIB_WEEKDAY_FRIDAY 6
+	#define URTCLIB_WEEKDAY_FRIDAY 5
 	/**
-	 * \brief Week day definition, [Sun..Sat] as [1..7]. Saturday
+	 * \brief Week day definition, [Mon..Sun] as [1..7]. Saturday
 	 */
-	#define URTCLIB_WEEKDAY_SATURDAY 7
+	#define URTCLIB_WEEKDAY_SATURDAY 6
 
 
 

@@ -24,7 +24,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.4.0
+ * @version 6.5.0
  */
 
 #include <Arduino.h>
@@ -831,10 +831,12 @@ bool uRTCLib::alarmDisable(const uint8_t alarm) {
 			switch (alarm) {
 				case URTCLIB_ALARM_1: // Alarm 1
 					mask = 0b11111110;  // A1IE bit
+					_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 					break;
 
 				case URTCLIB_ALARM_2: // Alarm 2
 					mask = 0b11111101;  // A2IE bit
+					_a2_mode = URTCLIB_ALARM_TYPE_1_NONE;
 					break;
 			} // Alarm type switch
 			if (mask) {
@@ -847,7 +849,7 @@ bool uRTCLib::alarmDisable(const uint8_t alarm) {
 				uRTCLIB_YIELD
 				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 				status = URTCLIB_WIRE.read();
-				status &= 0b11111110;  // A1IE bit
+				status &= mask;  // A1IE or A2IE bit
 				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
 				URTCLIB_WIRE.write(0x0E);
@@ -856,7 +858,6 @@ bool uRTCLib::alarmDisable(const uint8_t alarm) {
 				uRTCLIB_YIELD
 				URTCLIB_WIRE.endTransmission();
 				uRTCLIB_YIELD
-				_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 				return true;
 			}
 			break;
