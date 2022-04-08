@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.5.0
+ * @version 6.6.0
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -197,6 +197,11 @@
 	 */
 	#define URTCLIB_ALARM_2 URTCLIB_ALARM_TYPE_2_NONE
 
+	/**
+	 * \brief When requesting for any of both alarms, for triggered alarms
+	 */
+	#define URTCLIB_ALARM_ANY 0b01010101
+
 
 	/************	SQWG SELECTION: ***********/
 
@@ -311,7 +316,7 @@
 			bool lostPower();
 			void lostPowerClear();
 			bool enableBattery(); // Only DS3231 and DS3232.
-			bool disableBattery();
+			bool disableBattery(); // Only DS3231 and DS3232.
 
 
 			/******** Alarms ************/
@@ -323,6 +328,7 @@
 			uint8_t alarmMinute(const uint8_t);
 			uint8_t alarmHour(const uint8_t);
 			uint8_t alarmDayDow(const uint8_t);
+			bool alarmTriggered(const uint8_t);
 
 			/*********** SQWG ************/
 			uint8_t sqwgMode();
@@ -341,11 +347,18 @@
 			int8_t agingGet();
 			bool agingSet(int8_t);
 
+			/************ 32K Generator pin *************/
+			// Only DS3231 and DS3232. On DS1307 we map it to SqWG
+			bool enable32KOut();
+			bool disable32KOut();
+			bool status32KOut();
+
 
 		private:
 			// Address
 			int _rtc_address = URTCLIB_ADDRESS;
-			// RTC rad data
+
+			// RTC read data
 			uint8_t _second = 0;
 			uint8_t _minute = 0;
 			uint8_t _hour = 0;
@@ -364,14 +377,25 @@
 			uint8_t _a1_minute = 0;
 			uint8_t _a1_hour = 0;
 			uint8_t _a1_day_dow = 0;
+			bool _a1_triggered_flag = false;
 
 			uint8_t _a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			uint8_t _a2_minute = 0;
 			uint8_t _a2_hour = 0;
 			uint8_t _a2_day_dow = 0;
+			bool _a2_triggered_flag = false;
+
+			// Aging
+			int8_t _aging = 0;
 
 			// SQWG
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
+
+			// OSC failed Flag
+			bool _lost_power = false;
+
+			// 32K output Flag
+			bool _32k = false;
 
 	};
 

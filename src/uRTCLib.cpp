@@ -24,7 +24,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.5.0
+ * @version 6.6.0
  */
 
 #include <Arduino.h>
@@ -86,34 +86,40 @@ void uRTCLib::refresh() {
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
-			URTCLIB_WIRE.requestFrom(_rtc_address, 15);
+			URTCLIB_WIRE.requestFrom(_rtc_address, 19);
 			break;
 	}
-
+	// 0x00h
 	_second = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
 	_second = uRTCLIB_bcdToDec(_second);
 
+	// 0x01h
 	_minute = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
 	_minute = uRTCLIB_bcdToDec(_minute);
 
+	// 0x02h
 	_hour = URTCLIB_WIRE.read() & 0b00111111;
 	uRTCLIB_YIELD
 	_hour = uRTCLIB_bcdToDec(_hour);
 
+	// 0x03h
 	_dayOfWeek = URTCLIB_WIRE.read();
 	uRTCLIB_YIELD
 	_dayOfWeek = uRTCLIB_bcdToDec(_dayOfWeek);
 
+	// 0x04h
 	_day = URTCLIB_WIRE.read();
 	uRTCLIB_YIELD
 	_day = uRTCLIB_bcdToDec(_day);
 
+	// 0x05h
 	_month = URTCLIB_WIRE.read() & 0b00011111;
 	uRTCLIB_YIELD
 	_month = uRTCLIB_bcdToDec(_month);
 
+	// 0x06h
 	_year = URTCLIB_WIRE.read();
 	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
@@ -124,6 +130,7 @@ void uRTCLib::refresh() {
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uint8_t status;
+			// 0x07h
 			status = URTCLIB_WIRE.read();
 			if (status & 0b00010000) {
 				_sqwg_mode = status & 0b10000000 ? URTCLIB_SQWG_OFF_1 : URTCLIB_SQWG_OFF_0;
@@ -157,22 +164,26 @@ void uRTCLib::refresh() {
 			_a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 			_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 
+			// 0x07h
 			_a1_second = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_second & 0b10000000) >> 7);
 			_a1_second = uRTCLIB_bcdToDec((_a1_second & 0b01111111));   //parentheses for bitwise operation as argument for uRTCLIB_bcdToDec is required
 																		//otherwise wrong result will be returned by function
 
+			// 0x08h
 			_a1_minute = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_minute & 0b10000000) >> 6);
 			_a1_minute = uRTCLIB_bcdToDec((_a1_minute & 0b01111111));
 
+			// 0x09h
 			_a1_hour = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_hour & 0b10000000) >> 5);
 			_a1_hour = uRTCLIB_bcdToDec((_a1_hour & 0b00111111));
 
+			// 0x0Ah
 			_a1_day_dow = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a1_mode = _a1_mode | ((_a1_day_dow & 0b10000000) >> 4);
@@ -182,18 +193,21 @@ void uRTCLib::refresh() {
 			_a1_day_dow = _a1_day_dow & 0b00111111;
 			_a1_day_dow = uRTCLIB_bcdToDec(_a1_day_dow);
 
+			// 0x0Bh
 			_a2_minute = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_minute & 0b10000000) >> 6);
 			_a2_minute = _a2_minute & 0b01111111;
 			_a2_minute = uRTCLIB_bcdToDec(_a2_minute);
 
+			// 0x0Ch
 			_a2_hour = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_hour & 0b10000000) >> 5);
 			_a2_hour = _a2_hour & 0b00111111;
 			_a2_hour = uRTCLIB_bcdToDec(_a2_hour);
 
+			// 0x0Dh
 			_a2_day_dow = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 			_a2_mode = _a2_mode | ((_a2_day_dow & 0b10000000) >> 4);
@@ -204,6 +218,7 @@ void uRTCLib::refresh() {
 
 
 			// Control registers
+			// 0x0Eh
 			LSB = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 
@@ -227,15 +242,34 @@ void uRTCLib::refresh() {
 				_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			}
 
-			// Temperature registers (11h-12h) get updated automatically every 64s
-			URTCLIB_WIRE.beginTransmission(_rtc_address);
-			URTCLIB_WIRE.write(0x11);
-			URTCLIB_WIRE.endTransmission();
-			URTCLIB_WIRE.requestFrom(_rtc_address, 2);
+
+
+			// 0x0Fh
+			LSB = URTCLIB_WIRE.read(); //Control
 			uRTCLIB_YIELD
 
+			_lost_power = (bool) (LSB & 0x10000000b);
+			_32k = (bool) (LSB & 0x00001000b);
+			_a2_triggered_flag = (bool) (LSB & 0x00000010b);
+			_a1_triggered_flag = (bool) (LSB & 0x00000001b);
+
+
+			// 0x10h
+			_aging = URTCLIB_WIRE.read(); //Aging
+			uRTCLIB_YIELD
+			if (_aging & 0b10000000) {
+				_aging--;
+			}
+
+
+			// Temperature registers (11h-12h) get updated automatically every 64s
+
+			// 0x11h
 			MSB = URTCLIB_WIRE.read(); //2's complement int portion
+			uRTCLIB_YIELD
+			// 0x12h
 			LSB = URTCLIB_WIRE.read(); //fraction portion
+			uRTCLIB_YIELD
 			_temp = 0b0000000000000000 | (MSB  << 2) | (LSB >> 6); // 8+2 bits, *25 is the same as number + 2bitdecimals * 100 in base 10
 			if (MSB & 0b10000000) {
 				_temp = (_temp | 0b1111110000000000);
@@ -260,35 +294,7 @@ void uRTCLib::refresh() {
  * @return True if power was lost (both power sources, VCC and VBAT)
  */
 bool uRTCLib::lostPower() {
-        uint8_t status;
-
-	switch (_model) {
-		case URTCLIB_MODEL_DS1307:
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.beginTransmission(_rtc_address);
-			URTCLIB_WIRE.write(0X00);
-			URTCLIB_WIRE.endTransmission();
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
-			status = URTCLIB_WIRE.read();
-			uRTCLIB_YIELD
-			return ((status & 0B10000000) == 0B10000000);
-			break;
-
-		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
-		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
-		default:
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.beginTransmission(_rtc_address);
-			URTCLIB_WIRE.write(0X0F);
-			URTCLIB_WIRE.endTransmission();
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
-			status = URTCLIB_WIRE.read();
-			uRTCLIB_YIELD
-			return ((status & 0B10000000) == 0B10000000);
-			break;
-	}
+	return _lost_power;
 }
 
 /**
@@ -299,9 +305,8 @@ bool uRTCLib::lostPower() {
  * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  */
 void uRTCLib::lostPowerClear() {
-
-        uint8_t status;
-
+    uint8_t status;
+	_lost_power = false;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uRTCLIB_YIELD
@@ -1100,6 +1105,31 @@ uint8_t uRTCLib::alarmDayDow(const uint8_t alarm) {
 }
 
 
+
+/**
+ * \brief Checks if any alarm has been triggered
+ *
+ * @param alarm Alarm number:
+ *	 - #URTCLIB_ALARM_1
+ *	 - #URTCLIB_ALARM_2
+ *	 - #URTCLIB_ALARM_ANY
+ *
+ * @return Current stored day or dow. 0b11111111 means error.
+ */
+bool uRTCLib::alarmTriggered(const uint8_t alarm) {
+	if ((alarm == URTCLIB_ALARM_1 || alarm == URTCLIB_ALARM_ANY) && _a1_triggered_flag) {
+		return true;
+	}
+	if ((alarm == URTCLIB_ALARM_2 || alarm == URTCLIB_ALARM_ANY) && _a2_triggered_flag) {
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
 /************** SQuare Wave Generator ****************/
 
 /**
@@ -1341,26 +1371,7 @@ bool uRTCLib::ramWrite(const uint8_t address, byte data) {
  * @return Aging register value on RTC, 2-complement recalculated (use as regular int8_t)
  */
 int8_t uRTCLib::agingGet() {
-	int8_t ret = 0;
-	switch (_model) {
-		case URTCLIB_MODEL_DS3231:
-		case URTCLIB_MODEL_DS3232:
-			URTCLIB_WIRE.beginTransmission(_rtc_address);
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.write(0x10);
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.endTransmission();
-			uRTCLIB_YIELD
-			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
-			uRTCLIB_YIELD
-			ret = URTCLIB_WIRE.read(); //2's complement portion
-			if (ret & 0b10000000) {
-				ret--;
-			}
-			break;
-
-	}
-	return ret;
+	return _aging;
 }
 
 /**
@@ -1414,6 +1425,94 @@ bool uRTCLib::agingSet(int8_t val) {
 
 	}
 	return ret;
+}
+
+
+
+/**
+ * \brief Enables 32K pin output
+ *
+ * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
+ */
+bool uRTCLib::enable32KOut() {
+	_32k = true;
+	switch (_model) {
+		case URTCLIB_MODEL_DS1307: // As DS1307 doesn't have this pin, map it to SqWG at same frequency
+			return sqwgSetMode(URTCLIB_SQWG_32768H);
+			break;
+
+		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
+		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
+		default:
+			uint8_t status;
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0X0F);
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
+			status |= 0b00001000;
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0X0F);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(status);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			return true;
+			break;
+	}
+}
+
+/**
+ * \brief Enables 32K pin output
+ *
+ * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
+ */
+bool uRTCLib::disable32KOut() {
+	_32k = false;
+	switch (_model) {
+		case URTCLIB_MODEL_DS1307: // As DS1307 doesn't have this pin, map it to SqWG at same frequency
+			return sqwgSetMode(URTCLIB_SQWG_OFF_0);
+			break;
+
+		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
+		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
+		default:
+			uint8_t status;
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			URTCLIB_WIRE.write(0X0F);
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			status = URTCLIB_WIRE.read();
+			status &= 0b11110111;
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0X0F);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(status);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
+			return true;
+			break;
+	}
+}
+
+
+/**
+ * \brief Checks 32K pin output status
+ *
+ * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
+ */
+bool uRTCLib::status32KOut() {
+	return _32k;
 }
 
 
