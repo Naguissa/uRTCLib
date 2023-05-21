@@ -248,10 +248,10 @@ void uRTCLib::refresh() {
 			LSB = URTCLIB_WIRE.read(); //Control
 			uRTCLIB_YIELD
 
-			_lost_power = (bool) (LSB & 0x10000000b);
-			_32k = (bool) (LSB & 0x00001000b);
-			_a2_triggered_flag = (bool) (LSB & 0x00000010b);
-			_a1_triggered_flag = (bool) (LSB & 0x00000001b);
+			_lost_power = (bool) (LSB & 0b10000000);
+			_32k = (bool) (LSB & 0b00001000);
+			_a2_triggered_flag = (bool) (LSB & 0b00000010);
+			_a1_triggered_flag = (bool) (LSB & 0b00000001);
 
 
 			// 0x10h
