@@ -12,4 +12,8 @@ WoBo68 - https://github.com/WoBo68 - Power lost support for DS1307.
 mrfaptastic - https://github.com/mrfaptastic - enableBattery support (DS3231 and DS3232)
 Eleksir - https://github.com/eleksir - DS3231 and DS3232 aging factor register get/set
 derbic7 - https://github.com/derbic7 - alarmDisable fix for alarm2. Also AlarmTriggered functionality idea.
+lbovet - https://github.com/lbovet - Binary masks were wrongly set as hexadecimal numbers, PR #31
+
+
+
 
