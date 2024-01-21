@@ -1432,6 +1432,7 @@ bool uRTCLib::agingSet(int8_t val) {
 /**
  * \brief Enables 32K pin output
  *
+ * A Pull-Up resistor is required on the pin.
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */
 bool uRTCLib::enable32KOut() {
@@ -1468,7 +1469,7 @@ bool uRTCLib::enable32KOut() {
 }
 
 /**
- * \brief Enables 32K pin output
+ * \brief Disables 32K pin output
  *
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */

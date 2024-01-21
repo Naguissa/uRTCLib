@@ -671,11 +671,12 @@
 			/**
 			 * \brief Enables 32K pin output
 			 *
+			 * A Pull-Up resistor is required on the pin.
 			 * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
 			 */
 			bool enable32KOut();
 			/**
-			 * \brief Enables 32K pin output
+			 * \brief Disable 32K pin output
 			 *
 			 * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
 			 */
