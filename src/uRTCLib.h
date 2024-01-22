@@ -600,12 +600,16 @@
 			/**
 			 * \brief Checks if any alarm has been triggered
 			 *
+			 * NOTE: Alarm Flags A1F and A2F will be triggered whether or not Alarm Interrupt is Enabled A1IE and A2IE
+			 * When the RTC register values match alarm register settings, the corresponding Alarm Flag ‘A1F’ or ‘A2F’ bit is set to logic 1.
+			 * If using alarmTriggered function to check for alarm trigger, be sure to alarmMode function to see if alarm is enabled or not.
+			 *
 			 * @param alarm Alarm number:
 			 *	 - #URTCLIB_ALARM_1
 			 *	 - #URTCLIB_ALARM_2
 			 *	 - #URTCLIB_ALARM_ANY
 			 *
-			 * @return Current stored day or dow. 0b11111111 means error.
+			 * @return bool true or false
 			 */
 			bool alarmTriggered(const uint8_t);
 

@@ -16,6 +16,7 @@ Supported features:
 * temperature sensor for DS3231 and DS3232
 * Alarms (1 and 2) for DS3231 and DS3232
 * Power lost flag reading and clearing
+* Enable Oscillator flag to check if Oscillator will run on VBAT
 
 EEPROM support has been moved to https://github.com/Naguissa/uEEPROMLib
 
@@ -50,6 +51,9 @@ Included on example folder, available on Arduino IDE.
  - Check .h file to see all constants and per-model limitations
  - Alarm pin is normaly HIGH and turns LOW when active.
  - When using alarms, you need to clear the alarm flag manually using alarmClearFlag(). If not done alarm maintains its LOW state.
+ - Alarm Flags A1F and A2F will be triggered whether or not Alarm Interrupt is Enabled A1IE and A2IE
+ - When the RTC register values match alarm register settings, the corresponding Alarm Flag ‘A1F’ or ‘A2F’ bit is set to logic 1.
+ - If using alarmTriggered function to check for alarm trigger, be sure to alarmMode function to see if alarm is enabled or not.
  - When using alarms SQWG is turned off. When using SQWG alarms are turned off. They're mutually excluding.
 
 

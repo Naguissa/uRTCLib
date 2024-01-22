@@ -51,6 +51,11 @@ delay (2000);
 		Serial.println("ERROR activating battery.");
 	}
 
+	// Check whether OSC is set to use VBAT or not
+	if (rtc.getEOSCFlag()) {
+		Serial.println(F("Oscillator will not use VBAT when VCC cuts off. Time will not increment without VCC!"));
+	}
+
 	Serial.print("Lost power status: ");
 	if (rtc.lostPower()) {
 		Serial.print("POWER FAILED. Clearing flag...");
