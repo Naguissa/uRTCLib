@@ -68,31 +68,31 @@
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Sunday
 	 */
-	#define URTCLIB_WEEKDAY_SUNDAY 7
+	#define URTCLIB_WEEKDAY_SUNDAY 1
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Monday
 	 */
-	#define URTCLIB_WEEKDAY_MONDAY 1
+	#define URTCLIB_WEEKDAY_MONDAY 2
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Tuesday
 	 */
-	#define URTCLIB_WEEKDAY_TUESDAY 2
+	#define URTCLIB_WEEKDAY_TUESDAY 3
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Wednesday
 	 */
-	#define URTCLIB_WEEKDAY_WEDNESDAY 3
+	#define URTCLIB_WEEKDAY_WEDNESDAY 4
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Thursday
 	 */
-	#define URTCLIB_WEEKDAY_THURSDAY 4
+	#define URTCLIB_WEEKDAY_THURSDAY 5
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Friday
 	 */
-	#define URTCLIB_WEEKDAY_FRIDAY 5
+	#define URTCLIB_WEEKDAY_FRIDAY 6
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Saturday
 	 */
-	#define URTCLIB_WEEKDAY_SATURDAY 6
+	#define URTCLIB_WEEKDAY_SATURDAY 7
 
 
 
@@ -293,45 +293,354 @@
 	class uRTCLib {
 		public:
 			/******* Constructors *******/
+			/**
+			 * \brief Constructor
+			 */
 			uRTCLib();
+			/**
+			 * \brief Constructor
+			 *
+			 * @param rtc_address I2C address of RTC
+			 */
 			uRTCLib(const int);
+			/**
+			 * \brief Constructor
+			 *
+			 * @param rtc_address I2C address of RTC
+			 * @param model RTC model:
+			 *	 - #URTCLIB_MODEL_DS1307
+			 *	 - #URTCLIB_MODEL_DS3231
+			 *	 - #URTCLIB_MODEL_DS3232
+			 */
 			uRTCLib(const int, const uint8_t);
 
 			/******* RTC functions ********/
+			/**
+			 * \brief Refresh data from HW RTC
+			 */
 			void refresh();
+			/**
+			 * \brief Returns actual second
+			 *
+			 * @return Current stored second
+			 */
 			uint8_t second();
+			/**
+			 * \brief Returns actual minute
+			 *
+			 * @return Current stored minute
+			 */
 			uint8_t minute();
+			/**
+			 * \brief Returns actual hour
+			 *
+			 * @return Current stored hour
+			 */
 			uint8_t hour();
+			/**
+			 * \brief Returns actual day
+			 *
+			 * @return Current stored day
+			 */
 			uint8_t day();
+			/**
+			 * \brief Returns actual month
+			 *
+			 * @return Current stored month
+			 */
 			uint8_t month();
+			/**
+			 * \brief Returns actual year
+			 *
+			 * @return Current stored year
+			 */
 			uint8_t year();
+			/**
+			 * \brief Returns actual Day Of Week
+			 *
+			 * @return Current stored Day Of Week
+			 *   - #URTCLIB_WEEKDAY_SUNDAY
+			 *   - #URTCLIB_WEEKDAY_MONDAY
+			 *   - #URTCLIB_WEEKDAY_TUESDAY
+			 *   - #URTCLIB_WEEKDAY_WEDNESDAY
+			 *   - #URTCLIB_WEEKDAY_THURSDAY
+			 *   - #URTCLIB_WEEKDAY_FRIDAY
+			 *   - #URTCLIB_WEEKDAY_SATURDAY
+			 */
 			uint8_t dayOfWeek();
+			/**
+			 * \brief Returns actual temperature
+			 *
+			 * Temperature is returned as degrees * 100; i.e.: 3050 is 30.50º
+			 *
+			 * WARNING: DS1307 has no temperature register, so it always returns #URTCLIB_TEMP_ERROR
+			 *
+			 * @return Current stored temperature
+			 */
 			int16_t temp();
+			/**
+			 * \brief Sets RTC datetime data
+			 *
+			 * @param second second to set to HW RTC
+			 * @param minute minute to set to HW RTC
+			 * @param hour hour to set to HW RTC
+			 * @param dayOfWeek day of week to set to HW RTC
+			 *   - #URTCLIB_WEEKDAY_SUNDAY
+			 *   - #URTCLIB_WEEKDAY_MONDAY
+			 *   - #URTCLIB_WEEKDAY_TUESDAY
+			 *   - #URTCLIB_WEEKDAY_WEDNESDAY
+			 *   - #URTCLIB_WEEKDAY_THURSDAY
+			 *   - #URTCLIB_WEEKDAY_FRIDAY
+			 *   - #URTCLIB_WEEKDAY_SATURDAY
+			 * @param dayOfMonth day of month to set to HW RTC
+			 * @param month month to set to HW RTC
+			 * @param year year to set to HW RTC in last 2 digits mode. As RTCs only support 19xx and 20xx years (see datasheets), it's harcoded to 20xx.
+			 */
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
+			/**
+			 * \brief Sets RTC i2 addres
+			 *
+			 * @param addr RTC i2C address
+			 */
 			void set_rtc_address(const int);
+			/**
+			 * \brief Sets RTC Model
+			 *
+			 * @param model RTC Model
+			 *	 - #URTCLIB_MODEL_DS1307
+			 *	 - #URTCLIB_MODEL_DS3231
+			 *	 - #URTCLIB_MODEL_DS3232
+			 */
 			void set_model(const uint8_t);
+			/**
+			 * \brief Gets RTC Model
+			 *
+			 * @return RTC Model
+			 *	 - #URTCLIB_MODEL_DS1307
+			 *	 - #URTCLIB_MODEL_DS3231
+			 *	 - #URTCLIB_MODEL_DS3232
+			 */
 			uint8_t model();
 
 			/******* Power ********/
+      /**
+      * \brief Returns Enable Oscillator Flah
+      *
+      * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
+      * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
+      * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power 
+      * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
+      * regardless of the status of the EOSC bit. When EOSC is disabled, all register data 
+      * is static.
+      *
+      * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
+      */
+      bool getEOSCFlag();
+			/**
+			 * \brief Returns lost power VBAT staus
+			 *
+			 * DS1307 has a 'CH' Clock Halt Bit in Register 00h.
+			 *
+			 * On first application of power to the device the time and date registers are typically reset to 01/01/00  01  00:00:00  (MM/DD/YY  DOW  HH:MM:SS).
+			 *
+			 * The CH bit in the seconds register will be set to a 1.
+			 *
+			 * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
+			 *
+			 * @return True if power was lost (both power sources, VCC and VBAT)
+			 */
 			bool lostPower();
+			/**
+			 * \brief Clears lost power VBAT staus
+			 *
+			 * DS1307 has a 'CH' Clock Halt Bit in Register 00h ->  When cleared to 0, the oscillator is enabled and time starts incermenting
+			 *
+			 * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
+			 */
 			void lostPowerClear();
+			/**
+			  *\brief Enable VBAT operation when VCC power is lost.
+			  *
+			  * DS3231/DS3232 should enable the battery by default on first power-up using VCC, however this sometimes
+			  * won't happen automatically, and therefore the Control Register needs to be forcefully overwritten
+			  * to set EOSC to 0. The devices are usually shipped from China with EOSC set to 1 to save battery
+			  * (even though they come with no battery included).
+			  *
+			  * Cause of frustration for a lot of first time users of the device.
+			  *   i.e. Time is lost even though battery present.
+			  *
+			  * Reference: https://forum.arduino.cc/index.php?topic=586520.msg3990086#msg3990086
+			  *
+			  * @return True on success
+			  */
 			bool enableBattery(); // Only DS3231 and DS3232.
+			/**
+			  *\brief Disable VBAT operation when VCC power is lost.
+			  *
+			  *
+			  * @return True on success
+			  */
 			bool disableBattery(); // Only DS3231 and DS3232.
 
 
 			/******** Alarms ************/
+			/**
+			 * \brief Sets any alarm
+			 *
+			 * This method can also be used to disable an alarm, but it's better to use alarmDisable(const uint8_t alarm) to do so.
+			 *
+			 * @param type Alarm type:
+			 *	 - #URTCLIB_ALARM_TYPE_1_NONE
+			 *	 - #URTCLIB_ALARM_TYPE_1_ALL_S
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_S
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_MS
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_HMS
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_DHMS
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS
+			 *	 - #URTCLIB_ALARM_TYPE_2_NONE
+			 *	 - #URTCLIB_ALARM_TYPE_2_ALL_M
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_M
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_HM
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_DHM
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_DOWHM
+			 * @param second second to set Alarm (ignored in Alarm 2)
+			 * @param minute minute to set Alarm
+			 * @param hour hour to set Alarm
+			 * @param day_dow Day of the month or DOW to set Alarm, depending on alarm type
+			 *
+			 * @return false in case of not supported (DS1307) or wrong parameters
+			 */
 			bool alarmSet(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t); // Seconds will be ignored on Alarm 2
+			/**
+			 * \brief Disables an alarm
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return false in case of not supported (DS1307) or wrong parameters
+			 */
 			bool alarmDisable(const uint8_t);
+			/**
+			 * \brief Clears an alarm flag
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return false in case of not supported (DS1307) or wrong parameters
+			 */
 			bool alarmClearFlag(const uint8_t);
+			/**
+			 * \brief Returns actual alarm mode.
+			 *
+			 * See URTCLIB_ALARM_TYPE_X_YYYYY defines to see modes
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return Current stored mode. 0b11111111 means error.
+			 *	 - #URTCLIB_ALARM_TYPE_1_NONE
+			 *	 - #URTCLIB_ALARM_TYPE_1_ALL_S
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_S
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_MS
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_HMS
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_DHMS
+			 *	 - #URTCLIB_ALARM_TYPE_1_FIXED_DOWHMS
+			 *	 -	...or...
+			 *	 - #URTCLIB_ALARM_TYPE_2_NONE
+			 *	 - #URTCLIB_ALARM_TYPE_2_ALL_M
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_M
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_HM
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_DHM
+			 *	 - #URTCLIB_ALARM_TYPE_2_FIXED_DOWHM
+			 */
 			uint8_t alarmMode(const uint8_t);
+			/**
+			 * \brief Returns actual alarm second
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return Current stored second. 0b11111111 means error.
+			 */
 			uint8_t alarmSecond(const uint8_t);
+			/**
+			 * \brief Returns actual alarm minute
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return Current stored minute. 0b11111111 means error.
+			 */
 			uint8_t alarmMinute(const uint8_t);
+			/**
+			 * \brief Returns actual alarm hour
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return Current stored hour. 0b11111111 means error.
+			 */
 			uint8_t alarmHour(const uint8_t);
+			/**
+			 * \brief Returns actual alarm day or DOW
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *
+			 * @return Current stored day or dow. 0b11111111 means error.
+			 */
 			uint8_t alarmDayDow(const uint8_t);
+			/**
+			 * \brief Checks if any alarm has been triggered
+			 *
+			 * NOTE: Alarm Flags A1F and A2F will be triggered whether or not Alarm Interrupt is Enabled A1IE and A2IE
+			 * When the RTC register values match alarm register settings, the corresponding Alarm Flag ‘A1F’ or ‘A2F’ bit is set to logic 1.
+			 * If using alarmTriggered function to check for alarm trigger, be sure to alarmMode function to see if alarm is enabled or not.
+			 *
+			 * @param alarm Alarm number:
+			 *	 - #URTCLIB_ALARM_1
+			 *	 - #URTCLIB_ALARM_2
+			 *	 - #URTCLIB_ALARM_ANY
+			 *
+			 * @return bool true or false
+			 */
 			bool alarmTriggered(const uint8_t);
 
 			/*********** SQWG ************/
+			/**
+			 * \brief Changes SQWG mode, including turning it off
+			 *
+			 * @param mode SQWG mode:
+			 *	 - #URTCLIB_SQWG_OFF_0
+			 *	 - #URTCLIB_SQWG_OFF_1
+			 *	 - #URTCLIB_SQWG_1H
+			 *	 - #URTCLIB_SQWG_1024H
+			 *	 - #URTCLIB_SQWG_4096H
+			 *	 - #URTCLIB_SQWG_8192H
+			 *	 - #URTCLIB_SQWG_32768H
+			 *
+			 * @return false in case of not supported (DS1307) or wrong parameters
+			 */
 			uint8_t sqwgMode();
+			/**
+			 * \brief Gets current SQWG mode
+			 *
+			 * @return SQWG mode:
+			 *	 - #URTCLIB_SQWG_OFF_0
+			 *	 - #URTCLIB_SQWG_OFF_1
+			 *	 - #URTCLIB_SQWG_1H
+			 *	 - #URTCLIB_SQWG_1024H
+			 *	 - #URTCLIB_SQWG_4096H
+			 *	 - #URTCLIB_SQWG_8192H
+			 *	 - #URTCLIB_SQWG_32768H
+			 */
 			bool sqwgSetMode(const uint8_t);
 
 
@@ -339,18 +648,61 @@
 			// Only DS1307 and DS3232.
 			// DS1307: Addresses 08h to 3Fh so we offset 08h positions and limit to 38h as maximum address
 			// DS3232: Addresses 14h to FFh so we offset 14h positions and limit to EBh as maximum address
+			/**
+			 * \brief Reads a byte from RTC RAM
+			 *
+			 * @param address RAM Address
+			 *
+			 * @return content of that position. If any error it will return always 0xFF;
+			 */
 			byte ramRead(const uint8_t);
+			/**
+			 * \brief Writes a byte to RTC RAM
+			 *
+			 * @param address RAM Address
+			 * @param data Content to write on that position
+			 *
+			 * @return true if correct
+			 */
 			bool ramWrite(const uint8_t, byte);
 
 			/************ Aging *************/
 			// Only DS3231 and DS3232. Address 0x10h
+			/**
+			 * \brief Reads actual aging value on the RTC
+			 *
+			 * @return Aging register value on RTC, 2-complement recalculated (use as regular int8_t)
+			 */
 			int8_t agingGet();
+			/**
+			 * \brief Sets aging value on the RTC
+			 *
+			 * @param val new value (use as regular int8_t, 2-complement conversion is done internally)
+			 *
+			 * @return True when executed, false if RTC doesn't support it.
+			 */
 			bool agingSet(int8_t);
 
 			/************ 32K Generator pin *************/
 			// Only DS3231 and DS3232. On DS1307 we map it to SqWG
+			/**
+			 * \brief Enables 32K pin output
+			 *
+			 * A Pull-Up resistor is required on the pin.
+			 * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
+			 */
 			bool enable32KOut();
+			/**
+			 * \brief Disable 32K pin output
+			 *
+			 * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
+			 */
 			bool disable32KOut();
+			/**
+			 * \brief Checks 32K pin output status
+			 *
+			 * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
+			 */
 			bool status32KOut();
 
 
@@ -377,13 +729,13 @@
 			uint8_t _a1_minute = 0;
 			uint8_t _a1_hour = 0;
 			uint8_t _a1_day_dow = 0;
-			bool _a1_triggered_flag = false;
+			//bool _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
 
 			uint8_t _a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			uint8_t _a2_minute = 0;
 			uint8_t _a2_hour = 0;
 			uint8_t _a2_day_dow = 0;
-			bool _a2_triggered_flag = false;
+			// bool _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
 
 			// Aging
 			int8_t _aging = 0;
@@ -391,11 +743,13 @@
 			// SQWG
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
-			// OSC failed Flag
-			bool _lost_power = false;
-
-			// 32K output Flag
-			bool _32k = false;
+			// Keep record of various Flags
+			// _lost_power = (bool) (_controlStatus & 0b10000000);
+			// _eosc = (bool) (_controlStatus & 0b01000000);
+			// _32k = (bool) (_controlStatus & 0b00001000);
+			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
+			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			uint8_t _controlStatus = 0x00;
 
 	};
 
