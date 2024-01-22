@@ -222,6 +222,7 @@ void uRTCLib::refresh() {
 			LSB = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
 
+			bool _eosc = (bool) (LSB & 0b10000000);
 			if (LSB & 0b00000100) {
 				_sqwg_mode = URTCLIB_SQWG_OFF_1;
 				// Alarms disabled?
@@ -243,15 +244,17 @@ void uRTCLib::refresh() {
 			}
 
 
-
 			// 0x0Fh
 			LSB = URTCLIB_WIRE.read(); //Control
 			uRTCLIB_YIELD
 
-			_lost_power = (bool) (LSB & 0b10000000);
-			_32k = (bool) (LSB & 0b00001000);
-			_a2_triggered_flag = (bool) (LSB & 0b00000010);
-			_a1_triggered_flag = (bool) (LSB & 0b00000001);
+			_controlStatus = LSB;
+			_controlStatus |= _eosc & 0b01000000;
+			// _lost_power = (bool) (_controlStatus & 0b10000000);
+			// _eosc = (bool) (_controlStatus & 0b01000000);
+			// _32k = (bool) (_controlStatus & 0b00001000);
+			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
 
 
 			// 0x10h
@@ -281,6 +284,22 @@ void uRTCLib::refresh() {
 }
 
 /**
+ * \brief Returns Enable Oscillator Flah
+ *
+ * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
+ * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
+ * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power 
+ * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
+ * regardless of the status of the EOSC bit. When EOSC is disabled, all register data 
+ * is static.
+ *
+ * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
+ */
+bool uRTCLib::getEOSCFlag() {
+	return (bool) (_controlStatus & 0b0000000);
+}
+
+/**
  * \brief Returns lost power VBAT staus
  *
  * DS1307 has a 'CH' Clock Halt Bit in Register 00h.
@@ -294,7 +313,7 @@ void uRTCLib::refresh() {
  * @return True if power was lost (both power sources, VCC and VBAT)
  */
 bool uRTCLib::lostPower() {
-	return _lost_power;
+	return (bool) (_controlStatus & 0b10000000);
 }
 
 /**
@@ -305,8 +324,7 @@ bool uRTCLib::lostPower() {
  * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  */
 void uRTCLib::lostPowerClear() {
-    uint8_t status;
-	_lost_power = false;
+  uint8_t status;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uRTCLIB_YIELD
@@ -1117,10 +1135,10 @@ uint8_t uRTCLib::alarmDayDow(const uint8_t alarm) {
  * @return Current stored day or dow. 0b11111111 means error.
  */
 bool uRTCLib::alarmTriggered(const uint8_t alarm) {
-	if ((alarm == URTCLIB_ALARM_1 || alarm == URTCLIB_ALARM_ANY) && _a1_triggered_flag) {
+	if ((alarm == URTCLIB_ALARM_1 || alarm == URTCLIB_ALARM_ANY) && (bool) (_controlStatus & 0b00000001)) {
 		return true;
 	}
-	if ((alarm == URTCLIB_ALARM_2 || alarm == URTCLIB_ALARM_ANY) && _a2_triggered_flag) {
+	if ((alarm == URTCLIB_ALARM_2 || alarm == URTCLIB_ALARM_ANY) && (bool) (_controlStatus & 0b00000010)) {
 		return true;
 	}
 	return false;
@@ -1436,7 +1454,6 @@ bool uRTCLib::agingSet(int8_t val) {
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */
 bool uRTCLib::enable32KOut() {
-	_32k = true;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307: // As DS1307 doesn't have this pin, map it to SqWG at same frequency
 			return sqwgSetMode(URTCLIB_SQWG_32768H);
@@ -1474,7 +1491,6 @@ bool uRTCLib::enable32KOut() {
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */
 bool uRTCLib::disable32KOut() {
-	_32k = false;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307: // As DS1307 doesn't have this pin, map it to SqWG at same frequency
 			return sqwgSetMode(URTCLIB_SQWG_OFF_0);
@@ -1513,7 +1529,7 @@ bool uRTCLib::disable32KOut() {
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */
 bool uRTCLib::status32KOut() {
-	return _32k;
+	return (bool) (_controlStatus & 0b00001000);
 }
 
 

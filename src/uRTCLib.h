@@ -423,6 +423,19 @@
 			uint8_t model();
 
 			/******* Power ********/
+      /**
+      * \brief Returns Enable Oscillator Flah
+      *
+      * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
+      * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
+      * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power 
+      * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
+      * regardless of the status of the EOSC bit. When EOSC is disabled, all register data 
+      * is static.
+      *
+      * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
+      */
+      bool getEOSCFlag();
 			/**
 			 * \brief Returns lost power VBAT staus
 			 *
@@ -712,13 +725,13 @@
 			uint8_t _a1_minute = 0;
 			uint8_t _a1_hour = 0;
 			uint8_t _a1_day_dow = 0;
-			bool _a1_triggered_flag = false;
+			//bool _a1_triggered_flag = false;
 
 			uint8_t _a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			uint8_t _a2_minute = 0;
 			uint8_t _a2_hour = 0;
 			uint8_t _a2_day_dow = 0;
-			bool _a2_triggered_flag = false;
+			//bool _a2_triggered_flag = false;
 
 			// Aging
 			int8_t _aging = 0;
@@ -727,10 +740,21 @@
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
 			// OSC failed Flag
-			bool _lost_power = false;
+			//bool _lost_power = false;
+
+			// Enable OSC Flag
+			//bool _eosc = false;
+
+			// Keep record of various Flags
+			// _lost_power = (bool) (_controlStatus & 0b10000000);
+			// _eosc = (bool) (_controlStatus & 0b01000000);
+			// _32k = (bool) (_controlStatus & 0b00001000);
+			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
+			uint8_t _controlStatus = 0x00;
 
 			// 32K output Flag
-			bool _32k = false;
+			//bool _32k = false;
 
 	};
 
