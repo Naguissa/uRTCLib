@@ -324,7 +324,7 @@ bool uRTCLib::lostPower() {
  * Others have a 'OSF' Oscillator Stop Flag in Register 0Fh
  */
 void uRTCLib::lostPowerClear() {
-  uint8_t status;
+	uint8_t status;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uRTCLIB_YIELD
@@ -1139,9 +1139,11 @@ uint8_t uRTCLib::alarmDayDow(const uint8_t alarm) {
 */
 bool uRTCLib::alarmTriggered(const uint8_t alarm) {
 	if ((alarm == URTCLIB_ALARM_1 || alarm == URTCLIB_ALARM_ANY) && (bool) (_controlStatus & 0b00000001)) {
+		// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001)
 		return true;
 	}
 	if ((alarm == URTCLIB_ALARM_2 || alarm == URTCLIB_ALARM_ANY) && (bool) (_controlStatus & 0b00000010)) {
+		// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010)
 		return true;
 	}
 	return false;

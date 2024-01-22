@@ -729,13 +729,13 @@
 			uint8_t _a1_minute = 0;
 			uint8_t _a1_hour = 0;
 			uint8_t _a1_day_dow = 0;
-			//bool _a1_triggered_flag = false;
+			//bool _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
 
 			uint8_t _a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			uint8_t _a2_minute = 0;
 			uint8_t _a2_hour = 0;
 			uint8_t _a2_day_dow = 0;
-			//bool _a2_triggered_flag = false;
+			// bool _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
 
 			// Aging
 			int8_t _aging = 0;
@@ -743,22 +743,13 @@
 			// SQWG
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
-			// OSC failed Flag
-			//bool _lost_power = false;
-
-			// Enable OSC Flag
-			//bool _eosc = false;
-
 			// Keep record of various Flags
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
 			// _eosc = (bool) (_controlStatus & 0b01000000);
 			// _32k = (bool) (_controlStatus & 0b00001000);
-			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
 			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
+			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
 			uint8_t _controlStatus = 0x00;
-
-			// 32K output Flag
-			//bool _32k = false;
 
 	};
 
