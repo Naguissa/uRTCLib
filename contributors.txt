@@ -13,6 +13,7 @@ mrfaptastic - https://github.com/mrfaptastic - enableBattery support (DS3231 and
 Eleksir - https://github.com/eleksir - DS3231 and DS3232 aging factor register get/set
 derbic7 - https://github.com/derbic7 - alarmDisable fix for alarm2. Also AlarmTriggered functionality idea.
 lbovet - https://github.com/lbovet - Binary masks were wrongly set as hexadecimal numbers, PR #31
+pk17r - https://github.com/pk17r - EOSC flag, improvements, DoW correction, documentation and improved example. PR #34
 
 
 
