@@ -68,31 +68,31 @@
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Sunday
 	 */
-	#define URTCLIB_WEEKDAY_SUNDAY 7
+	#define URTCLIB_WEEKDAY_SUNDAY 1
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Monday
 	 */
-	#define URTCLIB_WEEKDAY_MONDAY 1
+	#define URTCLIB_WEEKDAY_MONDAY 2
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Tuesday
 	 */
-	#define URTCLIB_WEEKDAY_TUESDAY 2
+	#define URTCLIB_WEEKDAY_TUESDAY 3
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Wednesday
 	 */
-	#define URTCLIB_WEEKDAY_WEDNESDAY 3
+	#define URTCLIB_WEEKDAY_WEDNESDAY 4
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Thursday
 	 */
-	#define URTCLIB_WEEKDAY_THURSDAY 4
+	#define URTCLIB_WEEKDAY_THURSDAY 5
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Friday
 	 */
-	#define URTCLIB_WEEKDAY_FRIDAY 5
+	#define URTCLIB_WEEKDAY_FRIDAY 6
 	/**
 	 * \brief Week day definition, [Mon..Sun] as [1..7]. Saturday
 	 */
-	#define URTCLIB_WEEKDAY_SATURDAY 6
+	#define URTCLIB_WEEKDAY_SATURDAY 7
 
 
 
