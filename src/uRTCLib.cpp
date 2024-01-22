@@ -859,7 +859,7 @@ bool uRTCLib::alarmDisable(const uint8_t alarm) {
 
 				case URTCLIB_ALARM_2: // Alarm 2
 					mask = 0b11111101;  // A2IE bit
-					_a2_mode = URTCLIB_ALARM_TYPE_1_NONE;
+					_a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 					break;
 			} // Alarm type switch
 			if (mask) {
