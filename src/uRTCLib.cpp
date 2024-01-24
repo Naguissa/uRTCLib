@@ -249,7 +249,7 @@ void uRTCLib::refresh() {
 			uRTCLIB_YIELD
 
 			_controlStatus = LSB;
-			_controlStatus |= _eosc & 0b01000000;
+			if(_eosc) _controlStatus |= 0b01000000;
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
 			// _eosc = (bool) (_controlStatus & 0b01000000);
 			// _32k = (bool) (_controlStatus & 0b00001000);
@@ -296,7 +296,7 @@ void uRTCLib::refresh() {
  * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
  */
 bool uRTCLib::getEOSCFlag() {
-	return (bool) (_controlStatus & 0b0000000);
+	return (bool) (_controlStatus & 0b01000000);
 }
 
 /**
