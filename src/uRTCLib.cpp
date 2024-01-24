@@ -100,9 +100,22 @@ void uRTCLib::refresh() {
 	_minute = uRTCLIB_bcdToDec(_minute);
 
 	// 0x02h
-	_hour = URTCLIB_WIRE.read() & 0b00111111;
+	_hour = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
+	Serial.println();
+	Serial.print("_hour BIN "); Serial.println(_hour, BIN);
+	_12hrMode = (bool) (_hour & 0b01000000);
+	if(_12hrMode) {
+		_pmNotAm = (bool) (_hour & 0b00100000);
+		_hour = _hour & 0b00011111;
+	}
+	else {
+		_hour = _hour & 0b00111111;
+	}
 	_hour = uRTCLIB_bcdToDec(_hour);
+	Serial.print("_12hrMode "); Serial.println(_12hrMode);
+	Serial.print("_pmNotAm "); Serial.println(_pmNotAm);
+	Serial.print("_hour DEC "); Serial.println(_hour, DEC);
 
 	// 0x03h
 	_dayOfWeek = URTCLIB_WIRE.read();
@@ -247,11 +260,13 @@ void uRTCLib::refresh() {
 			// 0x0Fh
 			LSB = URTCLIB_WIRE.read(); //Control
 			uRTCLIB_YIELD
-
 			_controlStatus = LSB;
 			if(_eosc) _controlStatus |= 0b01000000;
+			if(_12hrMode) _controlStatus |= 0b00100000;
+			Serial.print("_controlStatus "); Serial.println(_controlStatus, BIN);
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
 			// _eosc = (bool) (_controlStatus & 0b01000000);
+			// _12hrMode = (bool) (_controlStatus & 0b00100000);
 			// _32k = (bool) (_controlStatus & 0b00001000);
 			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
 			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
@@ -526,6 +541,26 @@ uint8_t uRTCLib::hour() {
 }
 
 /**
+ * \brief Returns whether clock is in 12 or 24 hour mode
+ * with AM or PM if in 12 hour mode
+ * 0 = 24 hour mode (0-23 hours)
+ * 1 = 12 hour mode AM hours (1-12 hours)
+ * 2 = 12 hour mode PM hours (1-12 hours)
+ *
+ * @return byte with value 0, 1 or 2
+ */
+uint8_t uRTCLib::hourModeAndAmPm() {
+	if((bool) (_controlStatus & 0b00100000)){		// _12hrMode = (bool) (_controlStatus & 0b00100000);
+		if(_pmNotAm)
+			return 2;
+		else
+			return 1;
+	}
+	else
+		return 0;
+}
+
+/**
  * \brief Returns actual day
  *
  * @return Current stored day
@@ -649,6 +684,55 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 	URTCLIB_WIRE.write((byte)statreg);
 	URTCLIB_WIRE.endTransmission();
 	*/
+}
+
+/**
+ * \brief Set clock in 12 or 24 hour mode
+ * along with AM or PM if in 12 hour mode
+ * 0 = 24 hour mode (0-23 hours)
+ * 1 = 12 hour mode AM hours (1-12 hours)
+ * 2 = 12 hour mode PM hours (1-12 hours)
+ *
+ * @param clockMode with value 0, 1 or 2
+ * @param hour hour to set to HW RTC
+ *
+ * @return false in case of wrong parameters
+ */
+bool uRTCLib::set_hour_mode_and_am_pm(const uint8_t clockMode, const uint8_t hour) {
+	if(clockMode > 2) return false;
+	if(!clockMode && hour > 23) return false;
+	if(clockMode && (hour == 0 || hour > 12)) return false;
+	// prepare hour register byte
+	byte hour_bcd = uRTCLIB_decToBcd(hour);
+	_hour = hour;
+	if(clockMode) {
+		_12hrMode = true;
+		_pmNotAm = (bool)(clockMode - 1);
+		hour_bcd |= 0B01000000;
+		if(_pmNotAm) hour_bcd |= 0B00100000;
+	}
+	else {
+		_12hrMode = false;
+	}
+	_controlStatus |= _12hrMode & 0b00100000;
+	// set hour register byte
+	uRTCLIB_YIELD
+	URTCLIB_WIRE.beginTransmission(_rtc_address);
+	URTCLIB_WIRE.write(0x02); // set next input to start at the hours register
+	URTCLIB_WIRE.write(hour_bcd); // set hours
+	URTCLIB_WIRE.endTransmission();
+	uRTCLIB_YIELD
+	//
+	URTCLIB_WIRE.beginTransmission(_rtc_address);
+	URTCLIB_WIRE.write(0X0F);
+	URTCLIB_WIRE.endTransmission();
+	uRTCLIB_YIELD
+	// Serial.print("hour_bcd "); Serial.println(hour_bcd, BIN);
+	// Serial.print("_12hrMode "); Serial.println(_12hrMode);
+	// Serial.print("_pmNotAm "); Serial.println(_pmNotAm);
+	// Serial.print("_hour DEC "); Serial.println(_hour, DEC);
+	// Serial.print("_controlStatus "); Serial.println(_controlStatus, BIN);
+	return true;
 }
 
 

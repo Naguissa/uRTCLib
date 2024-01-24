@@ -338,6 +338,16 @@
 			 */
 			uint8_t hour();
 			/**
+			 * \brief Returns whether clock is in 12 or 24 hour mode
+			 * and AM or PM if in 12 hour mode
+			 * 0 = 24 hour mode (0-23 hours)
+			 * 1 = 12 hour mode AM hours (1-12 hours)
+			 * 2 = 12 hour mode PM hours (1-12 hours)
+			 *
+			 * @return byte with value 0, 1 or 2
+			 */
+			uint8_t hourModeAndAmPm();
+			/**
 			 * \brief Returns actual day
 			 *
 			 * @return Current stored day
@@ -398,6 +408,19 @@
 			 */
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			/**
+			 * \brief Set clock in 12 or 24 hour mode
+			 * along with AM or PM if in 12 hour mode
+			 * 0 = 24 hour mode (0-23 hours)
+			 * 1 = 12 hour mode AM hours (1-12 hours)
+			 * 2 = 12 hour mode PM hours (1-12 hours)
+			 *
+			 * @param clockMode with value 0, 1 or 2
+			 * @param hour hour to set to HW RTC
+			 *
+			 * @return false in case of wrong parameters
+			 */
+			bool set_hour_mode_and_am_pm(const uint8_t, const uint8_t);
+			/**
 			 * \brief Sets RTC i2 addres
 			 *
 			 * @param addr RTC i2C address
@@ -423,19 +446,19 @@
 			uint8_t model();
 
 			/******* Power ********/
-      /**
-      * \brief Returns Enable Oscillator Flah
-      *
-      * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
-      * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
-      * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power 
-      * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
-      * regardless of the status of the EOSC bit. When EOSC is disabled, all register data 
-      * is static.
-      *
-      * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
-      */
-      bool getEOSCFlag();
+			/**
+			 * \brief Returns Enable Oscillator Flag
+			 *
+			 * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
+			 * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
+			 * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power
+			 * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
+			 * regardless of the status of the EOSC bit. When EOSC is disabled, all register data
+			 * is static.
+			 *
+			 * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
+			 */
+			bool getEOSCFlag();
 			/**
 			 * \brief Returns lost power VBAT staus
 			 *
@@ -743,9 +766,15 @@
 			// SQWG
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
+			// 12 hour or 24 hour mode
+			bool _12hrMode = false;
+			// am or pm
+			bool _pmNotAm = false;
+
 			// Keep record of various Flags
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
 			// _eosc = (bool) (_controlStatus & 0b01000000);
+			// _12hrMode = (bool) (_controlStatus & 0b00100000);
 			// _32k = (bool) (_controlStatus & 0b00001000);
 			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
 			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
