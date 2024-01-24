@@ -738,6 +738,7 @@
 			uint8_t _minute = 0;
 			uint8_t _hour = 0;
 			uint8_t _day = 0;
+			bool _pmNotAm = false;		// am or pm if 12 hour mode, _12hrMode in _controlStatus
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
@@ -765,11 +766,6 @@
 
 			// SQWG
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
-
-			// 12 hour or 24 hour mode
-			bool _12hrMode = false;
-			// am or pm
-			bool _pmNotAm = false;
 
 			// Keep record of various Flags
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
