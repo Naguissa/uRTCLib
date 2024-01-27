@@ -684,36 +684,65 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 
 /**
  * \brief Set clock in 12 or 24 hour mode
- * along with AM or PM if in 12 hour mode
- * 0 = 24 hour mode (0-23 hours)
- * 1 = 12 hour mode AM hours (1-12 hours)
- * 2 = 12 hour mode PM hours (1-12 hours)
+ * 12 hour mode has 1-12 hours and AM or PM flag
+ * 24 hour mode has 0-23 hours
+ * get current clock mode and AM or PM flag using hourModeAndAmPm()
  *
- * @param clockMode with value 0, 1 or 2
- * @param hour hour to set to HW RTC
- *
- * @return false in case of wrong parameters
+ * @param twelveHrMode true or false
  */
-bool uRTCLib::set_hour_mode_and_am_pm(const uint8_t clockMode, const uint8_t hour) {
-	if(clockMode > 2) return false;
-	if(!clockMode && hour > 23) return false;
-	if(clockMode && (hour == 0 || hour > 12)) return false;
+void uRTCLib::set_12hour_mode(const bool twelveHrMode) {
+	bool currentMode12Hr = (bool) (_controlStatus & 0b00100000);
+	if((currentMode12Hr && twelveHrMode) || (!currentMode12Hr && !twelveHrMode))	// already in same mode, return
+		return;
+	bool _pmNotAm = (bool) (_controlStatus & 0b00010000);
+	if(twelveHrMode && !currentMode12Hr) {
+		// current Mode is 24 hour
+		// requested Mode is 12 hour
+		if(_hour == 0) {		// 0Hr = 12AM
+			_hour = 12;
+			_pmNotAm = false;
+		}
+		else if(_hour < 12) {	// 1Hr-11Hr = 1AM-11AM
+			_pmNotAm = false;
+		}
+		else if(_hour == 12) {	// 12Hr = 12PM
+			_pmNotAm = true;
+		}
+		else {					// 13Hr-23Hr = 1PM-11PM
+			_hour -= 12;
+			_pmNotAm = true;
+		}
+	}
+	else {
+		// current Mode is 12 hour
+		// requested Mode is 24 hour
+		if(!_pmNotAm) {	// AM time 1AM-11AM = 1-11Hr, 12AM = 0Hr
+			if(_hour == 12)
+				_hour = 0;
+			// else _hour = 1-11, will remain same in 24 hour mode as well
+		}
+		else {	// PM time 12PM = 12Hr, 1PM-11PM = 13-23Hr
+			if(_hour < 12)
+				_hour += 12;
+			// else _hour = 12 PM, will remain same in 24 hour mode as well
+		}
+	}
 	// prepare hour register byte
-	byte hour_bcd = uRTCLIB_decToBcd(hour);
-	_hour = hour;
-	if(clockMode) {
+	byte hour_bcd = uRTCLIB_decToBcd(_hour);
+	if(twelveHrMode) {
 		// _12hrMode = true;
 		_controlStatus |= 0b00100000;               // _12hrMode = (bool) (_controlStatus & 0b00100000);
-		bool _pmNotAm = (bool)(clockMode - 1);
-		if(_pmNotAm) _controlStatus |= 0b00010000;  // _pmNotAm = (bool) (_controlStatus & 0b00010000);
 		hour_bcd |= 0B01000000;
-		if(_pmNotAm) hour_bcd |= 0B00100000;
+		// set AM or PM
+		if(_pmNotAm) {
+			_controlStatus |= 0b00010000;           // _pmNotAm = (bool) (_controlStatus & 0b00010000);
+			hour_bcd |= 0B00100000;
+		}
 	}
 	else {
 		// _12hrMode = false;
 		_controlStatus &= 0b11011111;
 	}
-	
 	// set hour register byte
 	uRTCLIB_YIELD
 	URTCLIB_WIRE.beginTransmission(_rtc_address);
@@ -726,7 +755,6 @@ bool uRTCLib::set_hour_mode_and_am_pm(const uint8_t clockMode, const uint8_t hou
 	URTCLIB_WIRE.write(0X0F);
 	URTCLIB_WIRE.endTransmission();
 	uRTCLIB_YIELD
-	return true;
 }
 
 

@@ -409,17 +409,13 @@
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			/**
 			 * \brief Set clock in 12 or 24 hour mode
-			 * along with AM or PM if in 12 hour mode
-			 * 0 = 24 hour mode (0-23 hours)
-			 * 1 = 12 hour mode AM hours (1-12 hours)
-			 * 2 = 12 hour mode PM hours (1-12 hours)
+			 * 12 hour mode has 1-12 hours and AM or PM flag
+			 * 24 hour mode has 0-23 hours
+			 * get current clock mode and AM or PM flag using hourModeAndAmPm()
 			 *
-			 * @param clockMode with value 0, 1 or 2
-			 * @param hour hour to set to HW RTC
-			 *
-			 * @return false in case of wrong parameters
+			 * @param twelveHrMode true or false
 			 */
-			bool set_hour_mode_and_am_pm(const uint8_t, const uint8_t);
+			void set_12hour_mode(const bool);
 			/**
 			 * \brief Sets RTC i2 addres
 			 *
