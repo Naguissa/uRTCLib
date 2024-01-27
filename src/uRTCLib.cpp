@@ -103,13 +103,11 @@ void uRTCLib::refresh() {
 	_hour = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
 	bool _12hrMode = (bool) (_hour & 0b01000000);
-	if(_12hrMode) {
-		_pmNotAm = (bool) (_hour & 0b00100000);
+	bool _pmNotAm = (bool) (_hour & 0b00100000);
+	if(_12hrMode)
 		_hour = _hour & 0b00011111;
-	}
-	else {
+	else
 		_hour = _hour & 0b00111111;
-	}
 	_hour = uRTCLIB_bcdToDec(_hour);
 
 	// 0x03h
@@ -258,9 +256,11 @@ void uRTCLib::refresh() {
 			_controlStatus = LSB;
 			if(_eosc) _controlStatus |= 0b01000000;
 			if(_12hrMode) _controlStatus |= 0b00100000;
+			if(_pmNotAm) _controlStatus |= 0b00010000;
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
 			// _eosc = (bool) (_controlStatus & 0b01000000);
 			// _12hrMode = (bool) (_controlStatus & 0b00100000);
+			// _pmNotAm = (bool) (_controlStatus & 0b00010000);
 			// _32k = (bool) (_controlStatus & 0b00001000);
 			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
 			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
@@ -547,7 +547,7 @@ uint8_t uRTCLib::hour() {
  */
 uint8_t uRTCLib::hourModeAndAmPm() {
 	if((bool) (_controlStatus & 0b00100000)){		// _12hrMode = (bool) (_controlStatus & 0b00100000);
-		if(_pmNotAm)
+		if((bool) (_controlStatus & 0b00010000))	// _pmNotAm = (bool) (_controlStatus & 0b00010000);
 			return 2;
 		else
 			return 1;
@@ -703,8 +703,9 @@ bool uRTCLib::set_hour_mode_and_am_pm(const uint8_t clockMode, const uint8_t hou
 	_hour = hour;
 	if(clockMode) {
 		// _12hrMode = true;
-		_controlStatus |= 0b00100000;
-		_pmNotAm = (bool)(clockMode - 1);
+		_controlStatus |= 0b00100000;               // _12hrMode = (bool) (_controlStatus & 0b00100000);
+		bool _pmNotAm = (bool)(clockMode - 1);
+		if(_pmNotAm) _controlStatus |= 0b00010000;  // _pmNotAm = (bool) (_controlStatus & 0b00010000);
 		hour_bcd |= 0B01000000;
 		if(_pmNotAm) hour_bcd |= 0B00100000;
 	}
@@ -725,11 +726,6 @@ bool uRTCLib::set_hour_mode_and_am_pm(const uint8_t clockMode, const uint8_t hou
 	URTCLIB_WIRE.write(0X0F);
 	URTCLIB_WIRE.endTransmission();
 	uRTCLIB_YIELD
-	// Serial.print("hour_bcd "); Serial.println(hour_bcd, BIN);
-	// Serial.print("_12hrMode "); Serial.println(_12hrMode);
-	// Serial.print("_pmNotAm "); Serial.println(_pmNotAm);
-	// Serial.print("_hour DEC "); Serial.println(_hour, DEC);
-	// Serial.print("_controlStatus "); Serial.println(_controlStatus, BIN);
 	return true;
 }
 

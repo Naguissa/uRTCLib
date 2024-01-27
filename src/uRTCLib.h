@@ -738,7 +738,6 @@
 			uint8_t _minute = 0;
 			uint8_t _hour = 0;
 			uint8_t _day = 0;
-			bool _pmNotAm = false;		// am or pm if 12 hour mode, _12hrMode in _controlStatus
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
@@ -753,13 +752,13 @@
 			uint8_t _a1_minute = 0;
 			uint8_t _a1_hour = 0;
 			uint8_t _a1_day_dow = 0;
-			//bool _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
+			//bool _a1_triggered_flag = _controlStatus  LSB Bit 0
 
 			uint8_t _a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			uint8_t _a2_minute = 0;
 			uint8_t _a2_hour = 0;
 			uint8_t _a2_day_dow = 0;
-			// bool _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// bool _a2_triggered_flag = _controlStatus  Bit 1
 
 			// Aging
 			int8_t _aging = 0;
@@ -768,12 +767,14 @@
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
 			// Keep record of various Flags
-			// _lost_power = (bool) (_controlStatus & 0b10000000);
-			// _eosc = (bool) (_controlStatus & 0b01000000);
-			// _12hrMode = (bool) (_controlStatus & 0b00100000);
-			// _32k = (bool) (_controlStatus & 0b00001000);
-			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
-			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// _controlStatus  MSB Bit 7    _lost_power        = (bool) (_controlStatus & 0b10000000);
+			// _controlStatus  Bit 6        _eosc              = (bool) (_controlStatus & 0b01000000);
+			// _controlStatus  Bit 5        _12hrMode          = (bool) (_controlStatus & 0b00100000);
+			// _controlStatus  Bit 4        _pmNotAm           = (bool) (_controlStatus & 0b00010000);    // am or pm if 12 hour mode
+			// _controlStatus  Bit 3        _32k               = (bool) (_controlStatus & 0b00001000);
+			// _controlStatus  Bit 2
+			// _controlStatus  Bit 1        _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// _controlStatus  LSB Bit 0    _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
 			uint8_t _controlStatus = 0x00;
 
 	};
