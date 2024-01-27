@@ -338,6 +338,16 @@
 			 */
 			uint8_t hour();
 			/**
+			 * \brief Returns whether clock is in 12 or 24 hour mode
+			 * and AM or PM if in 12 hour mode
+			 * 0 = 24 hour mode (0-23 hours)
+			 * 1 = 12 hour mode AM hours (1-12 hours)
+			 * 2 = 12 hour mode PM hours (1-12 hours)
+			 *
+			 * @return byte with value 0, 1 or 2
+			 */
+			uint8_t hourModeAndAmPm();
+			/**
 			 * \brief Returns actual day
 			 *
 			 * @return Current stored day
@@ -398,6 +408,15 @@
 			 */
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			/**
+			 * \brief Set clock in 12 or 24 hour mode
+			 * 12 hour mode has 1-12 hours and AM or PM flag
+			 * 24 hour mode has 0-23 hours
+			 * get current clock mode and AM or PM flag using hourModeAndAmPm()
+			 *
+			 * @param twelveHrMode true or false
+			 */
+			void set_12hour_mode(const bool);
+			/**
 			 * \brief Sets RTC i2 addres
 			 *
 			 * @param addr RTC i2C address
@@ -423,19 +442,19 @@
 			uint8_t model();
 
 			/******* Power ********/
-      /**
-      * \brief Returns Enable Oscillator Flah
-      *
-      * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
-      * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
-      * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power 
-      * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
-      * regardless of the status of the EOSC bit. When EOSC is disabled, all register data 
-      * is static.
-      *
-      * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
-      */
-      bool getEOSCFlag();
+			/**
+			 * \brief Returns Enable Oscillator Flag
+			 *
+			 * DS3231 Control Register (0Eh) Bit 7: Enable Oscillator (EOSC)
+			 * When set to logic 0, the oscillator is started. When set to logic 1, the oscillator
+			 * is stopped when the DS3231 switches to VBAT. This bit is clear (logic 0) when power
+			 * is first applied. When the DS3231 is powered by VCC, the oscillator is always on
+			 * regardless of the status of the EOSC bit. When EOSC is disabled, all register data
+			 * is static.
+			 *
+			 * @return _eosc flag - 0 if set to enable OSC with VBAT if VCC is stopped
+			 */
+			bool getEOSCFlag();
 			/**
 			 * \brief Returns lost power VBAT staus
 			 *
@@ -729,13 +748,13 @@
 			uint8_t _a1_minute = 0;
 			uint8_t _a1_hour = 0;
 			uint8_t _a1_day_dow = 0;
-			//bool _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
+			//bool _a1_triggered_flag = _controlStatus  LSB Bit 0
 
 			uint8_t _a2_mode = URTCLIB_ALARM_TYPE_2_NONE;
 			uint8_t _a2_minute = 0;
 			uint8_t _a2_hour = 0;
 			uint8_t _a2_day_dow = 0;
-			// bool _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// bool _a2_triggered_flag = _controlStatus  Bit 1
 
 			// Aging
 			int8_t _aging = 0;
@@ -744,11 +763,14 @@
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
 			// Keep record of various Flags
-			// _lost_power = (bool) (_controlStatus & 0b10000000);
-			// _eosc = (bool) (_controlStatus & 0b01000000);
-			// _32k = (bool) (_controlStatus & 0b00001000);
-			// _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
-			// _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// _controlStatus  MSB Bit 7    _lost_power        = (bool) (_controlStatus & 0b10000000);
+			// _controlStatus  Bit 6        _eosc              = (bool) (_controlStatus & 0b01000000);
+			// _controlStatus  Bit 5        _12hrMode          = (bool) (_controlStatus & 0b00100000);
+			// _controlStatus  Bit 4        _pmNotAm           = (bool) (_controlStatus & 0b00010000);    // am or pm if 12 hour mode
+			// _controlStatus  Bit 3        _32k               = (bool) (_controlStatus & 0b00001000);
+			// _controlStatus  Bit 2
+			// _controlStatus  Bit 1        _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
+			// _controlStatus  LSB Bit 0    _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
 			uint8_t _controlStatus = 0x00;
 
 	};
