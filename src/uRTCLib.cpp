@@ -1046,6 +1046,7 @@ bool uRTCLib::alarmClearFlag(const uint8_t alarm) {
 				URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 				status = URTCLIB_WIRE.read();
 				status &= mask;  // A?F bit
+				_controlStatus &= mask;	// clear alarm triggered flags on _controlStatus as well
 				URTCLIB_WIRE.beginTransmission(_rtc_address);
 				uRTCLIB_YIELD
 				URTCLIB_WIRE.write(0x0F);
