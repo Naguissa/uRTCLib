@@ -255,6 +255,7 @@ void uRTCLib::refresh() {
 			// 0x0Fh
 			LSB = URTCLIB_WIRE.read(); //Control
 			uRTCLIB_YIELD
+			// Serial.print("0x0Fh "); Serial.println(LSB, BIN);
 			_controlStatus = LSB;
 			if(_eosc) _controlStatus |= 0b01000000;
 			if(_12hrMode) _controlStatus |= 0b00100000;
@@ -341,15 +342,15 @@ void uRTCLib::lostPowerClear() {
 	_controlStatus &= 0b01111111;	// clear lost power status
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
-			uRTCLIB_YIELD
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
-			URTCLIB_WIRE.write(0X00);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x00);
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			status = URTCLIB_WIRE.read();
 			status &= 0b01111111;
-			uRTCLIB_YIELD
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x00);
@@ -363,15 +364,15 @@ void uRTCLib::lostPowerClear() {
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
-			uRTCLIB_YIELD
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
-			URTCLIB_WIRE.write(0X0F);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.write(0x0F);
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			status = URTCLIB_WIRE.read();
 			status &= 0b01111111;
-			uRTCLIB_YIELD
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0F);

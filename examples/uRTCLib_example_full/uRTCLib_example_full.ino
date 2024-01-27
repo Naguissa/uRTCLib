@@ -35,7 +35,7 @@ byte rtcModel = URTCLIB_MODEL_DS3231;
 uint8_t position;
 
 void setup() {
-delay (2000);
+	delay (2000);
 	Serial.begin(9600);
 	Serial.println("Serial OK");
 	//  Max position: 32767
@@ -50,7 +50,7 @@ delay (2000);
 	// set RTC Model
 	rtc.set_model(rtcModel);
 
-	// refresh data from RTC HW in RTC class object
+	// refresh data from RTC HW in RTC class object so flags like rtc.lostPower(), rtc.getEOSCFlag(), etc, can get populated
 	rtc.refresh();
 
 	// Only use once, then disable
