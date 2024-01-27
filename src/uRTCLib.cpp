@@ -436,6 +436,8 @@ bool uRTCLib::enableBattery() {
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
 			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			uRTCLIB_YIELD
 			status =  URTCLIB_WIRE.read();
