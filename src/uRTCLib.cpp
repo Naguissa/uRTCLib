@@ -334,6 +334,8 @@ bool uRTCLib::lostPower() {
  */
 void uRTCLib::lostPowerClear() {
 	uint8_t status;
+	// _lost_power = (bool) (_controlStatus & 0b10000000);
+	_controlStatus &= 0b01111111;	// clear lost power status
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			uRTCLIB_YIELD
@@ -1539,6 +1541,8 @@ bool uRTCLib::agingSet(int8_t val) {
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */
 bool uRTCLib::enable32KOut() {
+	//_32k = (bool) (_controlStatus & 0b00001000);
+	_controlStatus |= 0b00001000;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307: // As DS1307 doesn't have this pin, map it to SqWG at same frequency
 			return sqwgSetMode(URTCLIB_SQWG_32768H);
@@ -1576,6 +1580,8 @@ bool uRTCLib::enable32KOut() {
  * As DS1307 doen't have this functionality we map it to SqWG with 32K frequency
  */
 bool uRTCLib::disable32KOut() {
+	//_32k = (bool) (_controlStatus & 0b00001000);
+	_controlStatus &= 0b11110111;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307: // As DS1307 doesn't have this pin, map it to SqWG at same frequency
 			return sqwgSetMode(URTCLIB_SQWG_OFF_0);
