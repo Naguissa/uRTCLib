@@ -227,8 +227,10 @@ void uRTCLib::refresh() {
 			// 0x0Eh
 			LSB = URTCLIB_WIRE.read();
 			uRTCLIB_YIELD
+			// Serial.print("0x0Eh "); Serial.println(LSB, BIN);
 
 			bool _eosc = (bool) (LSB & 0b10000000);
+			// Serial.print("_eosc "); Serial.println(_eosc);
 			if (LSB & 0b00000100) {
 				_sqwg_mode = URTCLIB_SQWG_OFF_1;
 				// Alarms disabled?
@@ -257,6 +259,7 @@ void uRTCLib::refresh() {
 			if(_eosc) _controlStatus |= 0b01000000;
 			if(_12hrMode) _controlStatus |= 0b00100000;
 			if(_pmNotAm) _controlStatus |= 0b00010000;
+			// Serial.print("_controlStatus "); Serial.println(_controlStatus, BIN);
 			// _lost_power = (bool) (_controlStatus & 0b10000000);
 			// _eosc = (bool) (_controlStatus & 0b01000000);
 			// _12hrMode = (bool) (_controlStatus & 0b00100000);
@@ -411,22 +414,24 @@ bool uRTCLib::enableBattery() {
 		default:
 			uint8_t status;
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			status = URTCLIB_WIRE.read();
 			status &= 0b01111111;
-			uRTCLIB_YIELD
-
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(status);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
 
 			// Return the status bit as a bool, to check against values of Control Register (0Eh)
-			uRTCLIB_YIELD
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
@@ -434,8 +439,10 @@ bool uRTCLib::enableBattery() {
 			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			uRTCLIB_YIELD
 			status =  URTCLIB_WIRE.read();
-			status &= 0b10000000;
-			return (status == 0b00000000);
+			bool _eosc = (bool) (status & 0b10000000);
+			if(_eosc) _controlStatus |= 0b01000000;
+			else _controlStatus &= 0b10111111;
+			return !_eosc;
 			break;
 	}
 
@@ -461,31 +468,36 @@ bool uRTCLib::disableBattery() {
 		default:
 			uint8_t status;
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
+			uRTCLIB_YIELD
 			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			status = URTCLIB_WIRE.read();
-			status |= 0b10000000;
-			uRTCLIB_YIELD
-
+			status |= 0b10000000;	// set eosc bit high to disable battery
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(status);
+			uRTCLIB_YIELD
+			URTCLIB_WIRE.endTransmission();
+			uRTCLIB_YIELD
 
 			// Return the status bit as a bool, to check against values of Control Register (0Eh)
-			uRTCLIB_YIELD
 			URTCLIB_WIRE.beginTransmission(_rtc_address);
 			uRTCLIB_YIELD
 			URTCLIB_WIRE.write(0x0E);
 			uRTCLIB_YIELD
-			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
+			URTCLIB_WIRE.endTransmission();
 			uRTCLIB_YIELD
+			URTCLIB_WIRE.requestFrom(_rtc_address, 1);
 			status =  URTCLIB_WIRE.read();
-			status &= 0b10000000;
-			return (status == 0b10000000);
+			bool _eosc = (bool) (status & 0b10000000);
+			if(_eosc) _controlStatus |= 0b01000000;
+			else _controlStatus &= 0b10111111;
+			return _eosc;
 			break;
 	}
 
