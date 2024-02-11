@@ -318,7 +318,7 @@
 			/**
 			 * \brief Refresh data from HW RTC
 			 */
-			void refresh();
+			bool refresh();
 			/**
 			 * \brief Returns actual second
 			 *
