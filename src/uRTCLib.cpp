@@ -70,7 +70,7 @@ uRTCLib::uRTCLib(const int rtc_address, const uint8_t model) {
 /**
  * \brief Refresh data from HW RTC
  */
-void uRTCLib::refresh() {
+bool uRTCLib::refresh() {
 	uRTCLIB_YIELD
 	URTCLIB_WIRE.beginTransmission(_rtc_address);
 	URTCLIB_WIRE.write(0); // set DS3231 register pointer to 00h
@@ -78,16 +78,22 @@ void uRTCLib::refresh() {
 	uRTCLIB_YIELD
 
 	// Adjust requested bytes to selected model:
+	size_t bytesRequested = 0;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
-			URTCLIB_WIRE.requestFrom(_rtc_address, 8);
+			bytesRequested = 8;
 			break;
 
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
 		// case URTCLIB_MODEL_DS3232: // Commented out because it's default mode
 		default:
-			URTCLIB_WIRE.requestFrom(_rtc_address, 19);
+			bytesRequested = 19;
 			break;
+	}
+	uint8_t bytesReceived = URTCLIB_WIRE.requestFrom(_rtc_address, bytesRequested);
+	if (bytesReceived < bytesRequested) {
+		// Error
+		return false;
 	}
 	// 0x00h
 	_second = URTCLIB_WIRE.read() & 0b01111111;
@@ -294,6 +300,7 @@ void uRTCLib::refresh() {
 			_temp = _temp * 25; // *25 is the same as number + 2bit (decimals) * 100 in base 10
 			break;
 	}
+	return true;
 }
 
 /**
