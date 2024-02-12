@@ -15,6 +15,7 @@ derbic7 - https://github.com/derbic7 - alarmDisable fix for alarm2. Also AlarmTr
 lbovet - https://github.com/lbovet - Binary masks were wrongly set as hexadecimal numbers, PR #31
 pk17r - https://github.com/pk17r - EOSC flag, improvements, DoW correction, documentation and improved example. PR #34
 pk17r - https://github.com/pk17r - Yes, again. 12/24h, improvements and bugfixes ( #27 ): PR #35
+Ben Wheeler - https://github.com/BenUniqcode - Add error check to refresh function. Now this function returns bool value, false on errors: PR #36
 
 
 

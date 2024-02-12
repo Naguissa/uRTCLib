@@ -21,7 +21,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.8.0
+ * @version 6.9.0
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -317,6 +317,8 @@
 			/******* RTC functions ********/
 			/**
 			 * \brief Refresh data from HW RTC
+			 *
+			 * @return False on error
 			 */
 			bool refresh();
 			/**
