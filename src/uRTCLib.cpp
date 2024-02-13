@@ -1460,7 +1460,7 @@ byte uRTCLib::ramRead(const uint8_t address) {
 			break;
 
 		case URTCLIB_MODEL_DS3232:
-			if (address < 0xeb) {
+			if (address < 0xec) {
 				offset = 0x14;
 			}
 			break;
@@ -1498,7 +1498,7 @@ bool uRTCLib::ramWrite(const uint8_t address, byte data) {
 			break;
 
 		case URTCLIB_MODEL_DS3232:
-			if (address < 0xeb) {
+			if (address < 0xec) {
 				offset = 0x14;
 			}
 			break;
