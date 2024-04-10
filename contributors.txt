@@ -17,6 +17,8 @@ pk17r - https://github.com/pk17r - EOSC flag, improvements, DoW correction, docu
 pk17r - https://github.com/pk17r - Yes, again. 12/24h, improvements and bugfixes ( #27 ): PR #35
 Ben Wheeler - https://github.com/BenUniqcode - Add error check to refresh function. Now this function returns bool value, false on errors: PR #36
 Ben Wheeler - https://github.com/BenUniqcode - Access to last one byte of RTCs RAM : PR #37
+rtek1000 - https://github.com/rtek1000 - Fix doc typo - Issue #40
+rtek1000 - https://github.com/rtek1000 - I2C unlock procedure and PIC implementation - Issue #42
 
 
 

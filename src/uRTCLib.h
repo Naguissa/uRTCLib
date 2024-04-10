@@ -17,11 +17,18 @@
  * Note: For AtTiny you need TinyWireM library from Adafruit installed (available on library manager).
  *
  *
+ * I2C locked in unknown state
+ *
+ * If uC crashes and I2C communication is locked in a unknown state you have a procedure to unlock it.
+ * It's not implemented in this library but you can find an explanation and a PIC implementation thanks
+ * to @rtek1000 in #42 : https://github.com/Naguissa/uRTCLib/issues/42
+ *
+ *
  * @see <a href="https://github.com/Naguissa/uRTCLib">https://github.com/Naguissa/uRTCLib</a>
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.9.1
+ * @version 6.9.2
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
