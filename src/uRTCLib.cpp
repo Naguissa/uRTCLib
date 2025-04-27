@@ -40,7 +40,11 @@
 		#define URTCLIB_WIRE TinyWireM
 	#else
 		#include <Wire.h>
-		#define URTCLIB_WIRE Wire
+        #ifdef URTCLIB_USE_WIRE1
+            #define URTCLIB_WIRE Wire1
+        #else
+            #define URTCLIB_WIRE Wire
+        #endif
 	#endif
 #endif
 #include "uRTCLib.h"
