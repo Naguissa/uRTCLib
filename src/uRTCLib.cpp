@@ -30,7 +30,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.9.2
+ * @version 6.9.3
  */
 
 #include <Arduino.h>
@@ -86,7 +86,7 @@ bool uRTCLib::refresh() {
 	uRTCLIB_YIELD
 
 	// Adjust requested bytes to selected model:
-	size_t bytesRequested = 0;
+	uRTCLIB_SIZE_T bytesRequested = 0;
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			bytesRequested = 8;

@@ -297,9 +297,9 @@
 		#endif
 	#endif
 	
-	#ifdef DARDUINO_AVR_MEGA2560
+	#ifdef ARDUINO_ARCH_MEGAAVR
 		/**
-		 * \brief MEGA2560 uses int instead size_t
+		 * \brief MEGAAVR core uses int instead size_t
 		 */
 		#define uRTCLIB_SIZE_T int;
 	#else
