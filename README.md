@@ -1,6 +1,7 @@
 # Arduino, ESP8266, STM32, ESP32 and others uRTCLib
 
-Master status:  [![Arduino CI](https://github.com/Naguissa/uRTCLib/workflows/Arduino_CI/badge.svg)]
+Master status:  [![Arduino CI](https://github.com/Naguissa/uRTCLib/workflows/arduino_ci/badge.svg)]
+
 
 ## What is this repository for? ##
 
