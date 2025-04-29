@@ -301,7 +301,7 @@
 		/**
 		 * \brief MEGAAVR core uses int instead size_t
 		 */
-		#define uRTCLIB_SIZE_T int;
+		#define uRTCLIB_SIZE_T int
 	#else
 		#define uRTCLIB_SIZE_T size_t
 	#endif
