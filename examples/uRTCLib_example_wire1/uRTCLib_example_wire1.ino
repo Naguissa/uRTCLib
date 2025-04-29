@@ -21,7 +21,11 @@
  */
 #include "Arduino.h"
 #include <Wire.h>
-#define URTCLIB_WIRE Wire1
+
+// YOU CAN DEFINE YOUR DESIRED WIRE BEFORE INCLUDING THE LIBRARY:
+#ifdef ARDUINO_SAM_DUE
+    #define URTCLIB_WIRE Wire1
+#endif
 #include "uRTCLib.h"
 
 
