@@ -116,6 +116,7 @@ bool uRTCLib::refresh() {
 	// 0x02h
 	_hour = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
+	// Serial.print("0x02h "); Serial.println(_hour, BIN);
 	bool _12hrMode = (bool) (_hour & 0b01000000);
 	bool _pmNotAm = (bool) (_hour & 0b00100000);
 	if(_12hrMode)
@@ -174,6 +175,11 @@ bool uRTCLib::refresh() {
 						break;
 				}
 			}
+			_controlStatus = 0;
+			if(_12hrMode) _controlStatus |= 0b00100000;
+			if(_pmNotAm) _controlStatus |= 0b00010000;
+			if(_sqwg_mode == URTCLIB_SQWG_32768H) _controlStatus |= 0b00001000;
+			// Serial.print("_controlStatus "); Serial.println(_controlStatus, BIN);
 			break;
 
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
