@@ -28,7 +28,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.9.3
+ * @version 6.9.4
  */
 /** \file uRTCLib.h
  *   \brief uRTCLib header file
@@ -782,14 +782,14 @@
 			uint8_t _sqwg_mode = URTCLIB_SQWG_OFF_1;
 
 			// Keep record of various Flags
-			// _controlStatus  MSB Bit 7    _lost_power        = (bool) (_controlStatus & 0b10000000);
-			// _controlStatus  Bit 6        _eosc              = (bool) (_controlStatus & 0b01000000);
-			// _controlStatus  Bit 5        _12hrMode          = (bool) (_controlStatus & 0b00100000);
+			// _controlStatus  MSB Bit 7    _lost_power        = (bool) (_controlStatus & 0b10000000);    // Lost power flag
+			// _controlStatus  Bit 6        _eosc              = (bool) (_controlStatus & 0b01000000);    // Oscilator enabled flag (negated)
+			// _controlStatus  Bit 5        _12hrMode          = (bool) (_controlStatus & 0b00100000);    // 12 or 24h mode
 			// _controlStatus  Bit 4        _pmNotAm           = (bool) (_controlStatus & 0b00010000);    // am or pm if 12 hour mode
-			// _controlStatus  Bit 3        _32k               = (bool) (_controlStatus & 0b00001000);
-			// _controlStatus  Bit 2
-			// _controlStatus  Bit 1        _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);
-			// _controlStatus  LSB Bit 0    _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);
+			// _controlStatus  Bit 3        32K                = (bool) (_controlStatus & 0b00001000);    // 32K
+			// _controlStatus  Bit 2        ---                = (bool) (_controlStatus & 0b00000100);    // None
+			// _controlStatus  Bit 1        _a2_triggered_flag = (bool) (_controlStatus & 0b00000010);    // Alarm 2 triggered flag
+			// _controlStatus  LSB Bit 0    _a1_triggered_flag = (bool) (_controlStatus & 0b00000001);    // Alarm 1 triggered flag
 			uint8_t _controlStatus = 0x00;
 
 	};

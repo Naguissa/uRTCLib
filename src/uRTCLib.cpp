@@ -30,7 +30,7 @@
  * @see <a href="https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html">https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html</a>
  * @see <a href="mailto:naguissa@foroelectro.net">naguissa@foroelectro.net</a>
  * @see <a href="https://github.com/Naguissa/uEEPROMLib">See uEEPROMLib for EEPROM support.</a>
- * @version 6.9.3
+ * @version 6.9.4
  */
 
 #include <Arduino.h>
@@ -90,6 +90,7 @@ bool uRTCLib::refresh() {
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
 			bytesRequested = 8;
+			_controlStatus = 0;
 			break;
 
 		// case URTCLIB_MODEL_DS3231: // Commented out because it's default mode
@@ -104,9 +105,15 @@ bool uRTCLib::refresh() {
 		return false;
 	}
 	// 0x00h
-	_second = URTCLIB_WIRE.read() & 0b01111111;
+	uint8_t tempByte = URTCLIB_WIRE.read();
+	// On DS1307 EOSC and lost_power functions are combined in CH (Clock Halt).
+	// It's is placed on 1st bit of 1st byte.
+	// So use that flag to mark both
+	if (_model == URTCLIB_MODEL_DS1307) {
+    	_controlStatus |= ((tempByte >> 1) & 0b01000000) | (tempByte & 0b10000000);
+	}
 	uRTCLIB_YIELD
-	_second = uRTCLIB_bcdToDec(_second);
+	_second = uRTCLIB_bcdToDec(tempByte & 0b01111111);
 
 	// 0x01h
 	_minute = URTCLIB_WIRE.read() & 0b01111111;
@@ -159,6 +166,8 @@ bool uRTCLib::refresh() {
 				switch (status & 0b00000011) {
 					case 0x00000011:
 						_sqwg_mode = URTCLIB_SQWG_32768H;
+						// Emulate 32K switch with 32K SQWG option on DS1307
+	                    _controlStatus |= 0b00001000;
 						break;
 
 					case 0x00000010:
@@ -175,10 +184,8 @@ bool uRTCLib::refresh() {
 						break;
 				}
 			}
-			_controlStatus = 0;
 			if(_12hrMode) _controlStatus |= 0b00100000;
 			if(_pmNotAm) _controlStatus |= 0b00010000;
-			if(_sqwg_mode == URTCLIB_SQWG_32768H) _controlStatus |= 0b00001000;
 			// Serial.print("_controlStatus "); Serial.println(_controlStatus, BIN);
 			break;
 
