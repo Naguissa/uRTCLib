@@ -107,7 +107,7 @@ bool uRTCLib::refresh() {
 	// 0x00h
 	uint8_t tempByte = URTCLIB_WIRE.read();
 	// On DS1307 EOSC and lost_power functions are combined in CH (Clock Halt).
-	// It's is placed on 1st bit of 1st byte.
+	// It is placed on 1st bit of 1st byte.
 	// So use that flag to mark both
 	if (_model == URTCLIB_MODEL_DS1307) {
     	_controlStatus |= ((tempByte >> 1) & 0b01000000) | (tempByte & 0b10000000);
