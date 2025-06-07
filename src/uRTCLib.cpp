@@ -110,10 +110,15 @@ bool uRTCLib::refresh() {
 	// It is placed on 1st bit of 1st byte.
 	// So use that flag to mark both
 	if (_model == URTCLIB_MODEL_DS1307) {
-    	_controlStatus |= ((tempByte >> 1) & 0b01000000) | (tempByte & 0b10000000);
+    	_controlStatus |= (((tempByte >> 1) & 0b01000000) | (tempByte & 0b10000000));
 	}
 	uRTCLIB_YIELD
-	_second = uRTCLIB_bcdToDec(tempByte & 0b01111111);
+	// Parantheses reqired on bitwise operation for correct uRTCLIB_bcdToDec operation
+	// Serial.print("byte_00h "); Serial.println(tempByte, BIN);
+	// Serial.print("byte_00h_bcdToDec_with_parantheses "); Serial.println(uRTCLIB_bcdToDec((tempByte & 0b01111111)));
+	// Serial.print("byte_00h_bcdToDec_without_parantheses "); Serial.println(uRTCLIB_bcdToDec(tempByte & 0b01111111));
+	_second = uRTCLIB_bcdToDec((tempByte & 0b01111111));
+	// Serial.print("_second "); Serial.println(_second);
 
 	// 0x01h
 	_minute = URTCLIB_WIRE.read() & 0b01111111;
