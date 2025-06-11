@@ -3,7 +3,7 @@
 Master status:  ![Arduino CI](https://github.com/Naguissa/uRTCLib/workflows/arduino_ci/badge.svg)
 
 
-## What is this repository for? ##
+## What is this repository for?
 
 Really tiny library to basic RTC functionality on Arduino, ESP8266, STM32, ESP32 and other microcontrollers.
 
@@ -24,7 +24,7 @@ EEPROM support has been moved to https://github.com/Naguissa/uEEPROMLib
 
 
 
-## How do I get set up? ##
+## How do I get set up?
 
 You can get it from Arduino libraries directly, searching by uRTCLib.
 
@@ -36,7 +36,7 @@ For manual installation:
 
 
 
-## Documentation and extras ##
+## Documentation and extras
 
 You can find all documentation and extras in this repository: https://github.com/Naguissa/uRTCLib_doc_and_extras
 
@@ -44,11 +44,21 @@ You can read documentation online here: https://naguissa.github.io/uRTCLib_doc_a
 
 
 
-## Examples ##
+## Examples
 
 Included on example folder, available on Arduino IDE.
 
-## Important notes ##
+
+## See also
+
+If you want/need to work with UNIX Timestamps, check out my uUnixDate Library: https://github.com/Naguissa/uUnixDate
+This library allows you to do it in practical and complete way.
+
+For ESP32 and ESP8266, you have a very useful example called "uRTCLib_example_uEspConfigLib".
+It lets you configure WiFi parameters and RTC date-time and control registers.
+
+
+## Important notes
 
  - Check .h file to see all constants and per-model limitations
  - Alarm pin is normaly HIGH and turns LOW when active.
@@ -60,7 +70,7 @@ Included on example folder, available on Arduino IDE.
 
 
 
-## Who do I talk to? ##
+## Who do I talk to?
 
  * [Naguissa](https://github.com/Naguissa)
  * https://www.foroelectro.net/librerias-arduino-ide-f29/rtclib-arduino-libreria-simple-y-eficaz-para-rtc-y-t95.html
@@ -68,7 +78,7 @@ Included on example folder, available on Arduino IDE.
 
 
 
-## Contribute ##
+## Contribute
 
 Any code contribution, report or comment are always welcome. Don't hesitate to use GitHub for that.
 
