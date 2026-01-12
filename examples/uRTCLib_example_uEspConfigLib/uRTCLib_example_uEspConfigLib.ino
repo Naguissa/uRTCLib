@@ -55,6 +55,9 @@ uint8_t position;
 // ESP8266 or ESP32 specific section:
 #if defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_ESP8266)
     #include "uEspConfigLib.h"
+    #include "uEspConfigLibFSInterface.h"
+    #include "uEspConfigLibFSNone.h"
+    
     uEspConfigLibFSInterface * configFs;
     uEspConfigLib * config;
     bool restartWiFi = false;
